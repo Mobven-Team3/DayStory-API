@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DayStory.WebAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6eed1aa7f39911103e32c5c729ab64067ba2618d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1048d81c5bb8e979e37a9dd4edc7ed88c219c661")]
 [assembly: System.Reflection.AssemblyProductAttribute("DayStory.WebAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DayStory.WebAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
