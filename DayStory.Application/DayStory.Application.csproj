@@ -10,7 +10,6 @@
     <Folder Include="Mappers\Events\" />
     <Folder Include="Mappers\DaySummaries\" />
     <Folder Include="Mappers\Users\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
 
   <ItemGroup>

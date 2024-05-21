@@ -12,5 +12,5 @@ public class UserContract : IBaseContract
     public string Password { get; set; }
     public string BirthDate { get; set; }
     public string? ProfilePicturePath { get; set; }
-    public Gender Gender { get; set; }
+    public string Gender { get; set; }
 }
