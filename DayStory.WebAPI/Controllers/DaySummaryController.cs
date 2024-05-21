@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DayStory.WebAPI.Controllers;
 
+[Route("api/[controller]s")]
+[ApiController]
 public class DaySummaryController : Controller
 {
     private readonly IDaySummaryService _daySummaryService;

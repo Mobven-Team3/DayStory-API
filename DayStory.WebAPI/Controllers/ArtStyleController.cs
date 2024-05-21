@@ -1,11 +1,12 @@
 ﻿using DayStory.Application.DTOs;
 using DayStory.Application.Interfaces;
-using DayStory.Application.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DayStory.WebAPI.Controllers;
 
+[Route("api/[controller]s")]
+[ApiController]
 public class ArtStyleController : Controller
 {
     private readonly IArtStyleService _artStyleService;

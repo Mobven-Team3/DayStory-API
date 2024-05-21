@@ -3,12 +3,6 @@ using Autofac;
 using Microsoft.EntityFrameworkCore;
 using DayStory.Infrastructure.Data.Context;
 using MovieAPI.WebAPI.AutoFac;
-using FluentValidation.AspNetCore;
-using DayStory.Application.Mappers;
-using DayStory.Application.Interfaces;
-using DayStory.Application.Services;
-using DayStory.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
 using DayStory.Application.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -30,15 +24,13 @@ builder.Services.AddControllers();
     //.AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<UserRegisterContractValidator>());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<ICacheService, CacheService>();
+//builder.Services.AddScoped<ICacheService, CacheService>();
 
-builder.Services.AddStackExchangeRedisCache(configure =>
-{
-    configure.Configuration = config.GetConnectionString("Redis");
-});
+//builder.Services.AddStackExchangeRedisCache(configure =>
+//{
+//    configure.Configuration = config.GetConnectionString("Redis");
+//});
 builder.Services.AddDbContext<DayStoryAPIDbContext>(builder =>
 {
     builder.UseSqlServer(config.GetConnectionString("MSSqlConnection"));
