@@ -28,23 +28,13 @@ public class UserRepository : GenericRepository<User>, IUserRepository
 
     public async Task<bool> UserEmailCheckAsync(string email)
     {
-        var user = await _dbSet.FirstOrDefaultAsync(x => x.Email == email);
-        if (user != null)
-        {
-            return true;
-        }
-        else
-            return false;
+        var userCheck = await _dbSet.FirstOrDefaultAsync(x => x.Email == email);
+        return userCheck != null ? true : false;
     }
 
     public async Task<bool> UserUsernameCheckAsync(string username)
     {
-        var user = await _dbSet.FirstOrDefaultAsync(x => x.Username == username);
-        if (user != null)
-        {
-            return true;
-        }
-        else
-            return false;
+        var userCheck = await _dbSet.FirstOrDefaultAsync(x => x.Username == username);
+        return userCheck != null ? true : false;
     }
 }
