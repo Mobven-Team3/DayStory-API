@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayStory.Application", "DayStory.Application\DayStory.Application.csproj", "{4DA752E0-4C98-4F20-8AA2-0C6FF2BE9E73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DayStory.Application", "DayStory.Application\DayStory.Application.csproj", "{4DA752E0-4C98-4F20-8AA2-0C6FF2BE9E73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayStory.Domain", "DayStory.Domain\DayStory.Domain.csproj", "{771DD0DA-0999-4159-9A6E-2927102AE74A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DayStory.Domain", "DayStory.Domain\DayStory.Domain.csproj", "{771DD0DA-0999-4159-9A6E-2927102AE74A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayStory.Infrastructure", "DayStory.Infrastructure\DayStory.Infrastructure.csproj", "{BC8B92AE-BCC1-4AAD-B207-B9289F870B3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DayStory.Infrastructure", "DayStory.Infrastructure\DayStory.Infrastructure.csproj", "{BC8B92AE-BCC1-4AAD-B207-B9289F870B3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayStory.WebAPI", "DayStory.WebAPI\DayStory.WebAPI.csproj", "{2EC6FE25-CC48-40FB-8D45-6A8639502A12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayStory.WebAPI", "DayStory.WebAPI\DayStory.WebAPI.csproj", "{202C3B8D-4C4E-4DC0-8378-7C27E0072A95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{BC8B92AE-BCC1-4AAD-B207-B9289F870B3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC8B92AE-BCC1-4AAD-B207-B9289F870B3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC8B92AE-BCC1-4AAD-B207-B9289F870B3B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2EC6FE25-CC48-40FB-8D45-6A8639502A12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2EC6FE25-CC48-40FB-8D45-6A8639502A12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2EC6FE25-CC48-40FB-8D45-6A8639502A12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2EC6FE25-CC48-40FB-8D45-6A8639502A12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{202C3B8D-4C4E-4DC0-8378-7C27E0072A95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{202C3B8D-4C4E-4DC0-8378-7C27E0072A95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{202C3B8D-4C4E-4DC0-8378-7C27E0072A95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{202C3B8D-4C4E-4DC0-8378-7C27E0072A95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
