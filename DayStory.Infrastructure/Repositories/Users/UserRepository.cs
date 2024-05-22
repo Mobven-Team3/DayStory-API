@@ -26,13 +26,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             throw new UserNotFoundException(email);
     }
 
-    public async Task<bool> UserEmailCheckAsync(string email)
-    {
-        var userCheck = await _dbSet.FirstOrDefaultAsync(x => x.Email == email);
-        return userCheck != null ? true : false;
-    }
-
-    public async Task<bool> UserUsernameCheckAsync(string username)
+    public async Task<bool> UsernameCheckAsync(string username)
     {
         var userCheck = await _dbSet.FirstOrDefaultAsync(x => x.Username == username);
         return userCheck != null ? true : false;

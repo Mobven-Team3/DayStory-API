@@ -6,5 +6,5 @@ namespace DayStory.Application.Interfaces;
 public interface IUserService : IBaseService<User, UserContract>
 {
     Task<string> LoginUserAsync(UserLoginContract requestModel);
-    Task RegisterUserAsync(UserContract requestModel);
+    Task RegisterUserAsync(UserRegisterContract requestModel);
 }

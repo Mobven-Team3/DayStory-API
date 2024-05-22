@@ -36,11 +36,11 @@ public class UserService : BaseService<User, UserContract>, IUserService
             throw new UserPasswordIncorrectException(user.Email);
     }
 
-    public async Task RegisterUserAsync(UserContract requestModel)
+    public async Task RegisterUserAsync(UserRegisterContract requestModel)
     {
-        var userEmailCheck = await _userRepository.UserEmailCheckAsync(requestModel.Email);
-        var userUsernameCheck = await _userRepository.UserUsernameCheckAsync(requestModel.Username);
-        if (!userEmailCheck && !userUsernameCheck)
+        var userEmailCheck = await _userRepository.UserCheckAsync(requestModel.Email);
+        var userUsernameCheck = await _userRepository.UsernameCheckAsync(requestModel.Username);
+        if (userEmailCheck == null && !userUsernameCheck)
         {
             var entity = _mapper.Map<User>(requestModel);
             entity.HashedPassword = _passwordHasher.HashPassword(entity, requestModel.Password);

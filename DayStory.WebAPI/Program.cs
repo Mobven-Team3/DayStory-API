@@ -11,6 +11,10 @@ using System.Text;
 using DayStory.WebAPI.Middlewares;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
+using FluentValidation.AspNetCore;
+using DayStory.Application.Validators;
+using FluentValidation;
+using DayStory.Application.Validators.UserValidators;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
@@ -20,8 +24,14 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(x => x.RegisterModule(new AutoFacModule()));
 
 // Add services to the container.
-builder.Services.AddControllers();
-    //.AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<UserRegisterContractValidator>());
+builder.Services.AddControllers().AddFluentValidation(fv =>
+{
+    fv.DisableDataAnnotationsValidation = true;
+    fv.LocalizationEnabled = false;
+});
+
+builder.Services.AddValidatorsFromAssemblyContaining<UserRegisterContractValidator>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

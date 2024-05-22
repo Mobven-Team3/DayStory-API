@@ -17,7 +17,7 @@ public class UserController : Controller
     }
 
     [HttpPost("Register")]
-    public async Task<IActionResult> RegisterAsync(UserContract request)
+    public async Task<IActionResult> RegisterAsync(UserRegisterContract request)
     {
         await _userService.RegisterUserAsync(request);
         return Ok("Successfully Register");
