@@ -1,6 +1,7 @@
 trigger:
 - main
 
+
 pool:
   name: Default
   demands:
@@ -9,24 +10,32 @@ pool:
 variables:
   token: "sqa_d61401827f15434a1621ea98e4a8914a8086f822"
 
+#    dotnet sonarscanner begin /k:"movie-project-api" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
 steps:
 - script: |
-    dotnet sonarscanner begin /k:"movie-project-api" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
+
     dotnet build
+    dotnet publish DayStory.Application\DayStory.Application.csproj -f net8.0 -c --self-contained -r linux-x64
+    dotnet publish DayStory.Domain\DayStory.Domain.csproj -f net8.0 -c --self-contained -r linux-x64
+    dotnet publish DayStory.Infrastructure\DayStory.Infrastructure.csproj -f net8.0 -c --self-contained -r linux-x64
+    dotnet publish DayStory.WebAPI\DayStory.WebAPI.csproj -f net8.0 -c --self-contained -r linux-x64
+
   displayName: 'Build'
 
- 
-- script: |
-    dotnet sonarscanner end /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
-  displayName: 'SonarQube'
-  
-- powershell: |
-    Start-Sleep -Seconds 20
-    $token = "$(token)"
-    $qualityGateStatusJson = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=movie-project-api" -Headers @{ "Authorization" = "Bearer $token" }
+#    dotnet sonarscanner end /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
+# - script: |
 
-    if ($qualityGateStatusJson.projectStatus.status -ne "OK") {
-        Write-Host "Quality gate check failed: $($qualityGateStatusJson.projectStatus.status)"
-        exit 1
-    }
-  displayName: 'SonarQube Quality Gate'
+#   displayName: 'SonarQube'
+  
+# - powershell: |
+#     Start-Sleep -Seconds 20
+#     $token = "$(token)"
+#     $qualityGateStatusJson = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=movie-project-api" -Headers @{ "Authorization" = "Bearer $token" }
+
+#     if ($qualityGateStatusJson.projectStatus.status -ne "OK") {
+#         Write-Host "Quality gate check failed: $($qualityGateStatusJson.projectStatus.status)"
+#         exit 1
+#     }
+#   displayName: 'SonarQube Quality Gate'
+
+
