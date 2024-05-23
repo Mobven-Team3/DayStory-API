@@ -15,12 +15,34 @@ steps:
 - script: |
 
     dotnet build
-    dotnet publish DayStory.Application\DayStory.Application.csproj -f net8.0 -c --self-contained -r linux-x64
-    dotnet publish DayStory.Domain\DayStory.Domain.csproj -f net8.0 -c --self-contained -r linux-x64
-    dotnet publish DayStory.Infrastructure\DayStory.Infrastructure.csproj -f net8.0 -c --self-contained -r linux-x64
-    dotnet publish DayStory.WebAPI\DayStory.WebAPI.csproj -f net8.0 -c --self-contained -r linux-x64
+    dotnet publish DayStory.Application\DayStory.Application.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.Domain\DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.Infrastructure\DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.WebAPI\DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
 
   displayName: 'Build'
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    runOptions: 'commands'
+    commands: 'sudo systemctl stop'
+    readyTimeout: '20000'
+
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    runOptions: 'commands'
+    commands: 'sudo systemctl start'
+    readyTimeout: '20000'
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    runOptions: 'commands'
+    commands: 'sudo systemctl status'
+    readyTimeout: '20000'
 
 #    dotnet sonarscanner end /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
 # - script: |
