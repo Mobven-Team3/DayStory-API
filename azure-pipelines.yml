@@ -1,7 +1,6 @@
 trigger:
 - main
 
-
 pool:
   name: Default
   demands:
@@ -9,18 +8,26 @@ pool:
 
 variables:
   token: "sqa_d61401827f15434a1621ea98e4a8914a8086f822"
-
 #    dotnet sonarscanner begin /k:"movie-project-api" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
+
 steps:
 - script: |
-
     dotnet build
+  displayName: 'Build'
+
+- script: |
     dotnet publish DayStory.Application\DayStory.Application.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.Domain\DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.Infrastructure\DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.WebAPI\DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
 
-  displayName: 'Build'
+  displayName: 'Publish'
+  condition: 
+
+- script: 
+    find DayStory.Infrastructure/bin/Debug/net8.0/linux-x64/publish/ -name 'DayStory.Infrastructure.runtimeconfig' -delete
+  displayName: 'FindDeploy'
+  condition: 
 
 - task: SSH@0
   inputs:
@@ -29,6 +36,13 @@ steps:
     commands: 'sudo systemctl stop'
     readyTimeout: '20000'
 
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    sourceFolder: '$(Pipeline.Workspace)/4/s/DayStory.Application/bin/Release/net8.0/linux-x64/publish/'
+    contents: '**'
+    targetFolder: '/var/www/DayStory'
+    readyTimeout: '20000'
 
 - task: SSH@0
   inputs:
@@ -59,5 +73,16 @@ steps:
 #         exit 1
 #     }
 #   displayName: 'SonarQube Quality Gate'
+
+#     sourceFolder: '$(Pipeline.Workspace)/4/s/DayStory.Application/bin/Release/net8.0/linux-x64/publish/'
+#     contents: '**'
+#     targetFolder: '/var/www/DayStory'
+
+# - task: CopyFilesOverSSH@0
+#   inputs:
+#     sshEndpoint: 'mobven-ssh'
+#     sourceFolder: '/var/www/DayStory'
+#     contents: '**'
+#     readyTimeout: '20000'
 
 
