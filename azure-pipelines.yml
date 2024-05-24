@@ -24,10 +24,10 @@ steps:
   displayName: 'Publish'
   condition: 
 
-- script: 
-    find DayStory.Infrastructure/bin/Debug/net8.0/linux-x64/publish/ -name 'DayStory.Infrastructure.runtimeconfig' -delete
-  displayName: 'FindDeploy'
-  condition: 
+# - script: 
+#     find DayStory.Infrastructure/bin/Debug/net8.0/linux-x64/publish/ -name 'DayStory.Infrastructure.runtimeconfig' -delete
+#   displayName: 'FindDeploy'
+#   condition: 
 
 - task: SSH@0
   inputs:
