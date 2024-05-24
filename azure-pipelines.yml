@@ -33,7 +33,7 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'sudo systemctl stop apiteams3-daystory.service'
+    commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl stop apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
 
 - task: CopyFilesOverSSH@0
@@ -48,7 +48,7 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'sudo systemctl start apiteams3-daystory.service'
+    commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl start apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
 
 - task: SSH@0
