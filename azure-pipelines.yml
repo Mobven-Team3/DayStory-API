@@ -55,7 +55,7 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'sudo systemctl status apiteams3-daystory.service'
+    commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl status apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
 
 #    dotnet sonarscanner end /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
