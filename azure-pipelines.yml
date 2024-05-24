@@ -39,7 +39,7 @@ steps:
 - task: CopyFilesOverSSH@0
   inputs:
     sshEndpoint: 'mobven-ssh'
-    sourceFolder: '$(Pipeline.Workspace)/4/s/DayStory.Application/bin/Release/net8.0/linux-x64/publish/'
+    sourceFolder: '$(Pipeline.Workspace)/s/DayStory.Application/bin/Release/net8.0/linux-x64/publish/'
     contents: '**'
     targetFolder: '/var/www/DayStory'
     readyTimeout: '20000'
