@@ -1,6 +1,5 @@
-﻿using DayStory.Application.DTOs;
-using DayStory.Application.Interfaces;
-using DayStory.Application.Pagination;
+﻿using DayStory.Application.Interfaces;
+using DayStory.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +15,14 @@ public class UserController : Controller
         _userService = service;
     }
 
-    [HttpPost("Register")]
-    public async Task<IActionResult> RegisterAsync(UserContract request)
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterAsync(UserRegisterContract request)
     {
         await _userService.RegisterUserAsync(request);
         return Ok("Successfully Register");
     }
 
-    [HttpPost("Login")]
+    [HttpPost("login")]
     public async Task<IActionResult> LoginAsync(UserLoginContract request)
     {
         var response = await _userService.LoginUserAsync(request);
@@ -32,25 +31,33 @@ public class UserController : Controller
 
     [Authorize(Roles = "Admin, User")]
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync(UserContract request)
+    public async Task<IActionResult> UpdateAsync(UserUpdateContract request)
     {
-        await _userService.UpdateAsync(request);
+        await _userService.UpdateUserAsync(request);
         return Ok("Updated");
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    [Authorize(Roles = "Admin, User")]
+    [HttpPut("password-update")]
+    public async Task<IActionResult> UpdatePasswordAsync(UserPasswordUpdateContract request)
     {
-        var responseModel = await _userService.GetAllAsync();
-        return Ok(responseModel);
+        await _userService.UpdatePasswordAsync(request);
+        return Ok("Updated");
     }
+
+    //[Authorize(Roles = "Admin")]
+    //[HttpGet]
+    //public async Task<IActionResult> GetAllAsync()
+    //{
+    //    var responseModel = await _userService.GetAllAsync();
+    //    return Ok(responseModel);
+    //}
 
     [Authorize(Roles = "Admin, User")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var responseModel = await _userService.GetByIdAsync(id);
+        var responseModel = await _userService.GetUserAsync(id);
         return Ok(responseModel);
     }
 

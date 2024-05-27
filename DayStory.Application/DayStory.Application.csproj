@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="Mappers\Events\" />
     <Folder Include="Mappers\DaySummaries\" />
-    <Folder Include="Mappers\Users\" />
   </ItemGroup>
 
   <ItemGroup>

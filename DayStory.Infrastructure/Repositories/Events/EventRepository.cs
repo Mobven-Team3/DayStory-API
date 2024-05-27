@@ -1,11 +1,12 @@
-﻿using DayStory.Domain.Entities;
+﻿using DayStory.Common.DTOs;
+using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace DayStory.Infrastructure.Repositories;
 
-public class EventRepository : GenericRepository<Event>, IEventRepository
+public class EventRepository : GenericRepository<Event, EventContract>, IEventRepository
 {
     private readonly DbSet<Event> _dbSet;
 

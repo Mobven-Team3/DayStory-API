@@ -1,7 +1,4 @@
-﻿using DayStory.Domain.Enums;
-
-namespace DayStory.Application.DTOs;
-
+﻿namespace DayStory.Common.DTOs;
 public class EventContract : IBaseContract
 {
     public int? Id { get; set; }

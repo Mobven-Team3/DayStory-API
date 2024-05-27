@@ -1,4 +1,4 @@
-﻿using DayStory.Domain.Enums;
+﻿using DayStory.Common.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DayStory.Domain.Entities;

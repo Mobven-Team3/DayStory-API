@@ -1,10 +1,10 @@
-﻿using DayStory.Domain.Entities;
+﻿using DayStory.Common.DTOs;
+using DayStory.Domain.Entities;
 
 namespace DayStory.Domain.Repositories;
 
-public interface IUserRepository : IGenericRepository<User>
+public interface IUserRepository : IGenericRepository<User, UserContract>
 {
     Task<User> UserCheckAsync(string email);
-    Task<bool> UserEmailCheckAsync(string email);
-    Task<bool> UserUsernameCheckAsync(string username);
+    Task<bool> UsernameCheckAsync(string username);
 }

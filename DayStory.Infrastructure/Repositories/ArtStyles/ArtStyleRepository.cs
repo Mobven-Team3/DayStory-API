@@ -1,11 +1,12 @@
-﻿using DayStory.Domain.Entities;
+﻿using DayStory.Common.DTOs;
+using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace DayStory.Infrastructure.Repositories;
 
-internal class ArtStyleRepository : GenericRepository<ArtStyle>, IArtStyleRepository
+internal class ArtStyleRepository : GenericRepository<ArtStyle, ArtStyleContract>, IArtStyleRepository
 {
     private readonly DbSet<ArtStyle> _dbSet;
 

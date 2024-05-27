@@ -1,7 +1,8 @@
-﻿using DayStory.Domain.Entities;
+﻿using DayStory.Common.DTOs;
+using DayStory.Domain.Entities;
 
 namespace DayStory.Domain.Repositories;
 
-public interface IDaySummaryRepository : IGenericRepository<DaySummary>
+public interface IDaySummaryRepository : IGenericRepository<DaySummary, DaySummaryContract>
 {
 }

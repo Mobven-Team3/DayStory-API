@@ -1,4 +1,4 @@
-﻿namespace DayStory.Domain.Enums;
+﻿namespace DayStory.Common.Enums;
 
 public enum Priority
 {

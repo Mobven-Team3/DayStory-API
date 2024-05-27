@@ -1015,9 +1015,22 @@
           }
         }
       },
+      "DayStory.Common/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/DayStory.Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DayStory.Common.dll": {}
+        }
+      },
       "DayStory.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "DayStory.Common": "1.0.0"
+        },
         "compile": {
           "bin/placeholder/DayStory.Domain.dll": {}
         },
@@ -1029,6 +1042,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
+          "DayStory.Common": "1.0.0",
           "DayStory.Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "8.0.5",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.5"
@@ -2626,6 +2640,11 @@
         "system.windows.extensions.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "DayStory.Common/1.0.0": {
+      "type": "project",
+      "path": "../DayStory.Common/DayStory.Common.csproj",
+      "msbuildProject": "../DayStory.Common/DayStory.Common.csproj"
     },
     "DayStory.Domain/1.0.0": {
       "type": "project",
