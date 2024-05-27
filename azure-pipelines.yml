@@ -29,7 +29,7 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'echo "2jTyQK##S5N$jC" | sudo -S systemctl stop apiteam3-daystory.service 2> /dev/null'
+    commands: ' systemctl stop apiteam3-daystory.service '
     readyTimeout: '20000'
   displayName: 'Service-Stop'
 
@@ -46,7 +46,7 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'echo "2jTyQK##S5N$jC" | sudo -S systemctl start apiteam3-daystory.service 2> /dev/null'
+    commands: ' systemctl start apiteam3-daystory.service '
     readyTimeout: '20000'
   displayName: 'Service-Start'
 
@@ -54,7 +54,7 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'echo "2jTyQK##S5N$jC" | sudo -S systemctl status apiteam3-daystory.service 2> /dev/null'
+    commands: 'systemctl status apiteam3-daystory.service '
     readyTimeout: '20000'
   displayName: 'Service-Status'
 
