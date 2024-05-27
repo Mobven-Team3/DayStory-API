@@ -8,27 +8,30 @@ pool:
 
 variables:
   token: "sqa_d61401827f15434a1621ea98e4a8914a8086f822"
-  dotnet sonarscanner begin /k:"DayStory-Api-_T3__DayStory-Api-_T3__3a191493-fd8f-4bbf-9b75-952356eb4485" /d:sonar.host.url="http://localhost:9000"  /d:sonar.token="sqa_302c8afa9b9b6410b5de145de201da1cd9ed75ba"
 
 steps:
+- script: |
+    dotnet sonarscanner begin /k:"DayStory-Api-_T3__DayStory-Api-_T3__3a191493-fd8f-4bbf-9b75-952356eb4485" /d:sonar.host.url="http://localhost:9000" /d:sonar.token="$(token)"
+  displayName: 'SonarQube Begin'
+
 - script: |
     dotnet build
   displayName: 'Build'
 
 - script: |
-    dotnet publish DayStory.Application\DayStory.Application.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    dotnet publish DayStory.Domain\DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    dotnet publish DayStory.Infrastructure\DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    dotnet publish DayStory.WebAPI\DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    displayName: 'Publish'
+    dotnet publish DayStory.Application/DayStory.Application.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.Domain/DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.Infrastructure/DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.WebAPI/DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
+  displayName: 'Publish'
 
 - task: SSH@0
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl stop apiteam3-daystory.service 2> /dev/null'
+    commands: 'echo "2jTyQK##S5N$jC" | sudo -S systemctl stop apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
-    displayName: 'Service-Stop'
+  displayName: 'Service-Stop'
 
 - task: CopyFilesOverSSH@0
   inputs:
@@ -37,53 +40,24 @@ steps:
     contents: '**'
     targetFolder: '/var/www/DayStory'
     readyTimeout: '20000'
-displayName: 'CopyFilesOverSSH'
+  displayName: 'CopyFilesOverSSH'
 
 - task: SSH@0
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl start apiteam3-daystory.service 2> /dev/null'
+    commands: 'echo "2jTyQK##S5N$jC" | sudo -S systemctl start apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
-displayName: 'Service-Start'
+  displayName: 'Service-Start'
 
 - task: SSH@0
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl status apiteam3-daystory.service 2> /dev/null'
+    commands: 'echo "2jTyQK##S5N$jC" | sudo -S systemctl status apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
-    displayName: 'Service-Status'
-
+  displayName: 'Service-Status'
 
 - script: |
-    dotnet sonarscanner end /d:sonar.token="sqa_302c8afa9b9b6410b5de145de201da1cd9ed75ba"
-  displayName: 'SonarQube'
-
-
-# - script: 
-#     find DayStory.Infrastructure/bin/Debug/net8.0/linux-x64/publish/ -name 'DayStory.Infrastructure.runtimeconfig' -delete
-#   displayName: 'FindDeploy'
-#   condition: 
-  
-# - powershell: |
-#     Start-Sleep -Seconds 20
-#     $token = "$(token)"
-#     $qualityGateStatusJson = Invoke-RestMethod -Uri "http://localhost:9000/api/qualitygates/project_status?projectKey=movie-project-api" -Headers @{ "Authorization" = "Bearer $token" }
-
-#     if ($qualityGateStatusJson.projectStatus.status -ne "OK") {
-#         Write-Host "Quality gate check failed: $($qualityGateStatusJson.projectStatus.status)"
-#         exit 1
-#     }
-#   displayName: 'SonarQube Quality Gate'
-
-#     sourceFolder: '$(Pipeline.Workspace)/4/s/DayStory.Application/bin/Release/net8.0/linux-x64/publish/'
-#     contents: '**'
-#     targetFolder: '/var/www/DayStory'
-
-# - task: CopyFilesOverSSH@0
-#   inputs:
-#     sshEndpoint: 'mobven-ssh'
-#     sourceFolder: '/var/www/DayStory'
-#     contents: '**'
-#     readyTimeout: '20000'
+    dotnet sonarscanner end /d:sonar.token="$(token)"
+  displayName: 'SonarQube End'
