@@ -8,7 +8,7 @@ pool:
 
 variables:
   token: "sqa_d61401827f15434a1621ea98e4a8914a8086f822"
-#    dotnet sonarscanner begin /k:"movie-project-api" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
+  dotnet sonarscanner begin /k:"DayStory-Api-_T3__DayStory-Api-_T3__3a191493-fd8f-4bbf-9b75-952356eb4485" /d:sonar.host.url="http://localhost:9000"  /d:sonar.token="sqa_302c8afa9b9b6410b5de145de201da1cd9ed75ba"
 
 steps:
 - script: |
@@ -20,14 +20,7 @@ steps:
     dotnet publish DayStory.Domain\DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.Infrastructure\DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.WebAPI\DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
-
-  displayName: 'Publish'
-  condition: 
-
-# - script: 
-#     find DayStory.Infrastructure/bin/Debug/net8.0/linux-x64/publish/ -name 'DayStory.Infrastructure.runtimeconfig' -delete
-#   displayName: 'FindDeploy'
-#   condition: 
+    displayName: 'Publish'
 
 - task: SSH@0
   inputs:
@@ -35,6 +28,7 @@ steps:
     runOptions: 'commands'
     commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl stop apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
+    displayName: 'Service-Stop'
 
 - task: CopyFilesOverSSH@0
   inputs:
@@ -43,6 +37,7 @@ steps:
     contents: '**'
     targetFolder: '/var/www/DayStory'
     readyTimeout: '20000'
+displayName: 'CopyFilesOverSSH'
 
 - task: SSH@0
   inputs:
@@ -50,6 +45,7 @@ steps:
     runOptions: 'commands'
     commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl start apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
+displayName: 'Service-Start'
 
 - task: SSH@0
   inputs:
@@ -57,11 +53,18 @@ steps:
     runOptions: 'commands'
     commands: 'echo “2jTyQK##S5N$jC” | sudo -S systemctl status apiteam3-daystory.service 2> /dev/null'
     readyTimeout: '20000'
+    displayName: 'Service-Status'
 
-#    dotnet sonarscanner end /d:sonar.login="sqa_d61401827f15434a1621ea98e4a8914a8086f822"
-# - script: |
 
-#   displayName: 'SonarQube'
+- script: |
+    dotnet sonarscanner end /d:sonar.token="sqa_302c8afa9b9b6410b5de145de201da1cd9ed75ba"
+  displayName: 'SonarQube'
+
+
+# - script: 
+#     find DayStory.Infrastructure/bin/Debug/net8.0/linux-x64/publish/ -name 'DayStory.Infrastructure.runtimeconfig' -delete
+#   displayName: 'FindDeploy'
+#   condition: 
   
 # - powershell: |
 #     Start-Sleep -Seconds 20
@@ -84,5 +87,3 @@ steps:
 #     sourceFolder: '/var/www/DayStory'
 #     contents: '**'
 #     readyTimeout: '20000'
-
-
