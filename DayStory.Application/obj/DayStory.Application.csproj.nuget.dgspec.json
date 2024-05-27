@@ -90,6 +90,66 @@
         }
       }
     },
+    "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj",
+        "projectName": "DayStory.Common",
+        "projectPath": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj",
+        "packagesPath": "C:\\Users\\nisat\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\nisat\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.205/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Domain\\DayStory.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -113,7 +173,11 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj": {
+                "projectPath": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -174,6 +238,9 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+              "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj": {
+                "projectPath": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Common\\DayStory.Common.csproj"
+              },
               "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Domain\\DayStory.Domain.csproj": {
                 "projectPath": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.Domain\\DayStory.Domain.csproj"
               }

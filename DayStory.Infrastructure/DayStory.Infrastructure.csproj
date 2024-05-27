@@ -16,6 +16,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\DayStory.Common\DayStory.Common.csproj" />
     <ProjectReference Include="..\DayStory.Domain\DayStory.Domain.csproj" />
   </ItemGroup>
 

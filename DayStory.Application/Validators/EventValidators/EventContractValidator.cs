@@ -1,4 +1,4 @@
-﻿using DayStory.Application.DTOs;
+﻿using DayStory.Common.DTOs;
 using FluentValidation;
 
 namespace DayStory.Application.Validators;

@@ -21,7 +21,7 @@ public class AutoFacModule : Module
 {
     protected override void Load(ContainerBuilder containerBuilder)
     {
-        containerBuilder.RegisterGeneric(typeof(GenericRepository<>)).As(typeof(IGenericRepository<>)).InstancePerLifetimeScope();
+        containerBuilder.RegisterGeneric(typeof(GenericRepository<,>)).As(typeof(IGenericRepository<,>)).InstancePerLifetimeScope();
 
         containerBuilder.RegisterType<AuthHelper>().As<IAuthHelper>().InstancePerLifetimeScope();
         containerBuilder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>().InstancePerLifetimeScope();
@@ -29,7 +29,7 @@ public class AutoFacModule : Module
         // AutoMapper
         containerBuilder.Register(context => new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<MapperProfile>(); // MapperProfile sınıfınızı burada kullanın
+            cfg.AddProfile<UserMapperProfile>();
         })).AsSelf().SingleInstance();
 
         containerBuilder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();

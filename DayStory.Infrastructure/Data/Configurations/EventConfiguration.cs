@@ -1,5 +1,5 @@
 ﻿using DayStory.Domain.Entities;
-using DayStory.Domain.Enums;
+using DayStory.Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

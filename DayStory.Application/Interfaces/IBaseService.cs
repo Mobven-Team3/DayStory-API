@@ -1,11 +1,12 @@
-﻿using DayStory.Domain.Entities;
+﻿using DayStory.Common.DTOs;
+using DayStory.Domain.Entities;
 using DayStory.Domain.Pagination;
 
 namespace DayStory.Application.Interfaces;
 
 public interface IBaseService<TEntity, TContract>
-    where TContract : class
     where TEntity : class, IBaseEntity
+    where TContract : class, IBaseContract
 {
     Task AddAsync(TContract model);
     Task AddRangeAsync(List<TContract> datas);

@@ -14,7 +14,6 @@ using Serilog.Sinks.Elasticsearch;
 using FluentValidation.AspNetCore;
 using DayStory.Application.Validators;
 using FluentValidation;
-using DayStory.Application.Validators.UserValidators;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();

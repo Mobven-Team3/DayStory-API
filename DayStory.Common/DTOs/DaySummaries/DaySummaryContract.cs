@@ -1,7 +1,4 @@
-﻿using DayStory.Domain.Entities;
-
-namespace DayStory.Application.DTOs;
-
+﻿namespace DayStory.Common.DTOs;
 public class DaySummaryContract : IBaseContract
 {
     public int? Id { get; set; }

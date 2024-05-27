@@ -1,5 +1,5 @@
-﻿using DayStory.Application.DTOs;
-using DayStory.Application.Interfaces;
+﻿using DayStory.Application.Interfaces;
+using DayStory.Common.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

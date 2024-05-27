@@ -1,5 +1,4 @@
-﻿namespace DayStory.Application.DTOs;
-
+﻿namespace DayStory.Common.DTOs;
 public class UserLoginContract
 {
     public string Email { get; set; }

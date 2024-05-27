@@ -1,7 +1,6 @@
-﻿using DayStory.Domain.Enums;
+﻿using DayStory.Common.Enums;
 
-namespace DayStory.Application.DTOs;
-
+namespace DayStory.Common.DTOs;
 public class UserContract : IBaseContract
 {
     public int? Id { get; set; }
@@ -9,8 +8,6 @@ public class UserContract : IBaseContract
     public string LastName { get; set; }
     public string Username { get; set; }
     public string Email { get; set; }
-    public string Password { get; set; }
     public string BirthDate { get; set; }
-    public string? ProfilePicturePath { get; set; }
-    public string Gender { get; set; }
+    public Gender Gender { get; set; }
 }

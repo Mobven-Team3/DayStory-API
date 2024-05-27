@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DayStory.Application.DTOs;
+using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Pagination;
 

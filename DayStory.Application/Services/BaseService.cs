@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DayStory.Application.Interfaces;
+using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
@@ -7,13 +8,13 @@ using DayStory.Domain.Repositories;
 namespace DayStory.Application.Services;
 
 public class BaseService<TEntity, TContract> : IBaseService<TEntity, TContract>
-    where TContract : class
     where TEntity : class, IBaseEntity
+    where TContract : class, IBaseContract
 {
-    private readonly IGenericRepository<TEntity> _repository;
+    private readonly IGenericRepository<TEntity, TContract> _repository;
     private readonly IMapper _mapper;
 
-    public BaseService(IGenericRepository<TEntity> repository, IMapper mapper)
+    public BaseService(IGenericRepository<TEntity, TContract> repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
@@ -62,8 +63,7 @@ public class BaseService<TEntity, TContract> : IBaseService<TEntity, TContract>
 
     public async Task UpdateAsync(TContract model)
     {
-        var entity = _mapper.Map<TEntity>(model);
-        var result = await _repository.UpdateAsync(entity);
+        var result = await _repository.UpdateAsync(model);
     }
 
     public async Task<PagedResponse<TContract>> GetPagedDataAsync(int pageNumber, int pageSize)

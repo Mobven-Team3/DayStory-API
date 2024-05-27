@@ -1,12 +1,12 @@
-﻿using DayStory.Domain.Entities;
-using DayStory.Domain.Exceptions;
+﻿using DayStory.Common.DTOs;
+using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace DayStory.Infrastructure.Repositories;
 
-public class UserRepository : GenericRepository<User>, IUserRepository
+public class UserRepository : GenericRepository<User, UserContract>, IUserRepository
 {
     private readonly DbSet<User> _dbSet;
 
@@ -23,12 +23,19 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             return user;
         }
         else
-            throw new UserNotFoundException(email);
+            return null;
     }
 
     public async Task<bool> UsernameCheckAsync(string username)
     {
         var userCheck = await _dbSet.FirstOrDefaultAsync(x => x.Username == username);
-        return userCheck != null ? true : false;
+        if (userCheck != null)
+        {
+            userCheck.LastLogin = DateTime.UtcNow;
+            await SaveAsync();
+            return true;
+        }
+        else
+            return false;
     }
 }
