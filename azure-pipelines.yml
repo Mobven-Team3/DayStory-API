@@ -23,13 +23,19 @@ steps:
     dotnet publish DayStory.Domain/DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.Infrastructure/DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.WebAPI/DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    dotnet publish DayStory.Common/DayStory.Common.csproj -f net8.0 -c Release --self-contained -r linux-x64
   displayName: 'Publish'
 
 - task: SSH@0
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: ' systemctl stop apiteam3-daystory.service '
+    commands: |
+      systemctl stop DayStory-Application.service
+      systemctl stop DayStory-Domain.service
+      systemctl stop DayStory-Infrastructure.service
+      systemctl stop DayStory-WebAPI.service
+      systemctl stop DayStory-Common.service
     readyTimeout: '20000'
   displayName: 'Service-Stop'
 
@@ -38,7 +44,43 @@ steps:
     sshEndpoint: 'mobven-ssh'
     sourceFolder: '$(Pipeline.Workspace)/s/DayStory.Application/bin/Release/net8.0/linux-x64/publish/'
     contents: '**'
-    targetFolder: '/var/www/DayStory'
+    targetFolder: '/var/www/DayStory/DayStory.Application'
+    readyTimeout: '20000'
+  displayName: 'CopyFilesOverSSH'
+
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    sourceFolder: '$(Pipeline.Workspace)/s/DayStory.Domain/bin/Release/net8.0/linux-x64/publish/'
+    contents: '**'
+    targetFolder: '/var/www/DayStory/DayStory.Domain'
+    readyTimeout: '20000'
+  displayName: 'CopyFilesOverSSH'
+
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    sourceFolder: '$(Pipeline.Workspace)/s/DayStory.Infrastructure/bin/Release/net8.0/linux-x64/publish/'
+    contents: '**'
+    targetFolder: '/var/www/DayStory/DayStory.Infrastructure'
+    readyTimeout: '20000'
+  displayName: 'CopyFilesOverSSH'
+
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    sourceFolder: '$(Pipeline.Workspace)/s/DayStory.WebAPI/bin/Release/net8.0/linux-x64/publish/'
+    contents: '**'
+    targetFolder: '/var/www/DayStory/DayStory.WebAPI'
+    readyTimeout: '20000'
+  displayName: 'CopyFilesOverSSH'
+
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'mobven-ssh'
+    sourceFolder: '$(Pipeline.Workspace)/s/DayStory.Common/bin/Release/net8.0/linux-x64/publish/'
+    contents: '**'
+    targetFolder: '/var/www/DayStory/DayStory.Common'
     readyTimeout: '20000'
   displayName: 'CopyFilesOverSSH'
 
@@ -46,7 +88,12 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: ' systemctl start apiteam3-daystory.service '
+    commands: |
+      systemctl start DayStory-Application.service
+      systemctl start DayStory-Domain.service
+      systemctl start DayStory-Infrastructure.service
+      systemctl start DayStory-WebAPI.service
+      systemctl start DayStory-Common.service
     readyTimeout: '20000'
   displayName: 'Service-Start'
 
@@ -54,7 +101,17 @@ steps:
   inputs:
     sshEndpoint: 'mobven-ssh'
     runOptions: 'commands'
-    commands: 'systemctl status apiteam3-daystory.service '
+    commands: |
+      systemctl start DayStory-Application.service  > outputdsApplication.txt || true
+      cat outputdsApplication.txt
+      systemctl start DayStory-Domain.service > outputdsdomain.txt || true
+      cat outputdsdomain.txt
+      systemctl start DayStory-Infrastructure.service > outputdsinfrastructure.txt || true
+      cat outputdsinfrastructure.txt
+      systemctl start DayStory-WebAPI.service > outputdswebapi.txt || true
+      cat outputdswebapi.txt
+      systemctl start DayStory-Common.service > outputdscommon.txt || true
+      cat outputdscommon.txt
     readyTimeout: '20000'
   displayName: 'Service-Status'
 
