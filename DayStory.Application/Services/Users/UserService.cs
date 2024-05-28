@@ -6,7 +6,6 @@ using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
 using DayStory.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
-using System.Diagnostics.Contracts;
 
 namespace DayStory.Application.Services;
 
@@ -34,6 +33,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
         var result = VerifyPassword(user, requestModel.Password);
         if (result)
         {
+            await _userRepository.UserLastLoginUpdateAsync(user);
             return _authHelper.Token(user);
         }
         else
@@ -52,6 +52,8 @@ public class UserService : BaseService<User, UserContract>, IUserService
         }
         else
         {
+            if(userEmailCheck.IsDeleted == true)
+                await _userRepository.SoftDeletedUserAddAsync(userEmailCheck);
             throw new UserAlreadyExistsException(requestModel.Email);
         }
     }
@@ -60,19 +62,13 @@ public class UserService : BaseService<User, UserContract>, IUserService
     {
         var user = await _userRepository.GetByIdAsync(requestModel.Id.Value);
         if (user == null)
-        {
             throw new UserNotFoundException(user.Id.ToString());
-        }
 
         if (!VerifyPassword(user, requestModel.CurrentPassword))
-        {
             throw new UserPasswordIncorrectException(user.Email);
-        }
 
         if (requestModel.Password == requestModel.CurrentPassword)
-        {
             throw new SamePasswordException(user.Email);
-        }
 
         string newPasswordHash = HashPassword(user, requestModel.Password);
         user.HashedPassword = newPasswordHash;

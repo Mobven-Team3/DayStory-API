@@ -30,6 +30,7 @@ public class AutoFacModule : Module
         containerBuilder.Register(context => new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<UserMapperProfile>();
+            cfg.AddProfile<EventMapperProfile>();
         })).AsSelf().SingleInstance();
 
         containerBuilder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();
