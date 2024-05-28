@@ -9,12 +9,6 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        CreateMap<User, UserContract>();
-        CreateMap<User, UserContract>().ReverseMap();
-
-        CreateMap<Event, EventContract>();
-        CreateMap<Event, EventContract>().ReverseMap();
-
         CreateMap<DaySummary, DaySummaryContract>();
         CreateMap<DaySummary, DaySummaryContract>().ReverseMap();
 
