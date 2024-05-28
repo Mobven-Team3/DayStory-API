@@ -1,6 +1,7 @@
 ﻿using DayStory.Application.Interfaces;
 using DayStory.Application.Pagination;
 using DayStory.Common.DTOs;
+using DayStory.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,25 +19,25 @@ public class EventController : Controller
 
     [Authorize(Roles = "Admin, User")]
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(EventContract request)
+    public async Task<IActionResult> CreateAsync(EventCreateContract request)
     {
-        await _eventService.AddAsync(request);
+        await _eventService.AddEventAsync(request);
         return Ok();
     }
 
     [Authorize(Roles = "Admin, User")]
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync(EventContract request)
+    public async Task<IActionResult> UpdateAsync(EventUpdateContract request)
     {
-        await _eventService.UpdateAsync(request);
+        await _eventService.UpdateEventAsync(request);
         return Ok("Updated");
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    [HttpGet("get-all/{userId}")]
+    public async Task<IActionResult> GetAllAsync(int userId)
     {
-        var responseModel = await _eventService.GetAllAsync();
+        var responseModel = await _eventService.GetAllEventAsync(userId);
         return Ok(responseModel);
     }
 
@@ -44,7 +45,7 @@ public class EventController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var responseModel = await _eventService.GetByIdAsync(id);
+        var responseModel = await _eventService.GetEventByIdAsync(id);
         return Ok(responseModel);
     }
 
@@ -52,7 +53,7 @@ public class EventController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        await _eventService.RemoveByIdAsync(id);
+        await _eventService.RemoveEventByIdAsync(id);
         return Ok("Delete successful");
     }
 

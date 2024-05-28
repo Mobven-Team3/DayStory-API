@@ -15,15 +15,27 @@ public class UserRepository : GenericRepository<User, UserContract>, IUserReposi
         _dbSet = context.Set<User>();
     }
 
+    public async Task SoftDeletedUserAddAsync(User user)
+    {
+        user.IsDeleted = false;
+        await UpdateAsync(user);
+    }
+
     public async Task<User> UserCheckAsync(string email)
     {
-        var user = await _dbSet.FirstOrDefaultAsync(x => x.Email == email);
+        var user = await _dbSet.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
         if (user != null)
         {
             return user;
         }
         else
             return null;
+    }
+
+    public async Task UserLastLoginUpdateAsync(User user)
+    {
+        user.LastLogin = DateTime.UtcNow;
+        await UpdateAsync(user);
     }
 
     public async Task<bool> UsernameCheckAsync(string username)
