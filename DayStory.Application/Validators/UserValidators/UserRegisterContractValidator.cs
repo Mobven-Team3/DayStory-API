@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace DayStory.Application.Validators;
 
-public class UserRegisterContractValidator : AbstractValidator<UserRegisterContract>
+public class UserRegisterContractValidator : AbstractValidator<RegisterUserContract>
 {
     public UserRegisterContractValidator()
     {

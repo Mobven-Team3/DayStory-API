@@ -11,15 +11,15 @@ public class EventMapperProfile : Profile
         CreateMap<Event, EventContract>();
         CreateMap<Event, EventContract>().ReverseMap();
 
-        CreateMap<Event, EventCreateContract>()
+        CreateMap<Event, CreateEventContract>()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(x => x.UserId));
-        CreateMap<Event, EventCreateContract>().ReverseMap()
+        CreateMap<Event, CreateEventContract>().ReverseMap()
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(x => x.UserId));
 
-        CreateMap<Event, EventGetContract>();
-        CreateMap<Event, EventGetContract>().ReverseMap();
+        CreateMap<Event, GetEventContract>();
+        CreateMap<Event, GetEventContract>().ReverseMap();
 
-        CreateMap<EventContract, EventUpdateContract>();
-        CreateMap<EventContract, EventUpdateContract>().ReverseMap();
+        CreateMap<EventContract, UpdateEventContract>();
+        CreateMap<EventContract, UpdateEventContract>().ReverseMap();
     }
 }

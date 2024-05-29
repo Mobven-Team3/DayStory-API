@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace DayStory.Application.Validators;
 
-public class UserPasswordUpdateContractValidator : AbstractValidator<UserPasswordUpdateContract>
+public class UserPasswordUpdateContractValidator : AbstractValidator<PasswordUpdateUserContract>
 {
     public UserPasswordUpdateContractValidator()
     {

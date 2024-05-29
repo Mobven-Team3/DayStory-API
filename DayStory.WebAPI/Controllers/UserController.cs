@@ -16,14 +16,14 @@ public class UserController : Controller
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> RegisterAsync(UserRegisterContract request)
+    public async Task<IActionResult> RegisterAsync(RegisterUserContract request)
     {
         await _userService.RegisterUserAsync(request);
         return Ok("Successfully Register");
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> LoginAsync(UserLoginContract request)
+    public async Task<IActionResult> LoginAsync(LoginUserContract request)
     {
         var response = await _userService.LoginUserAsync(request);
         return Ok(response);
@@ -31,7 +31,7 @@ public class UserController : Controller
 
     [Authorize(Roles = "Admin, User")]
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync(UserUpdateContract request)
+    public async Task<IActionResult> UpdateAsync(UpdateUserContract request)
     {
         await _userService.UpdateUserAsync(request);
         return Ok("Updated");
@@ -39,7 +39,7 @@ public class UserController : Controller
 
     [Authorize(Roles = "Admin, User")]
     [HttpPut("password-update")]
-    public async Task<IActionResult> UpdatePasswordAsync(UserPasswordUpdateContract request)
+    public async Task<IActionResult> UpdatePasswordAsync(PasswordUpdateUserContract request)
     {
         await _userService.UpdatePasswordAsync(request);
         return Ok("Updated");

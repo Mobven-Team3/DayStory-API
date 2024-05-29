@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
@@ -20,7 +19,7 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         _mapper = mapper;
     }
 
-    public async Task AddEventAsync(EventCreateContract model)
+    public async Task AddEventAsync(CreateEventContract model)
     {
         var entity = _mapper.Map<Event>(model);
         if(entity != null)
@@ -29,22 +28,34 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new ArgumentNullException(nameof(model));
     }
 
-    public async Task<List<EventGetContract>> GetAllEventAsync(int userId)
+    public async Task<List<GetEventContract>> GetEventsAsync(int userId)
     {
-        var response = await _eventRepository.GetAllEventsByUserIdAsync(userId);
+        var response = await _eventRepository.GetEventsByUserIdAsync(userId);
         if (response == null)
             throw new ArgumentNullException(nameof(response));
         else
-            return _mapper.Map<List<EventGetContract>>(response);
+            return _mapper.Map<List<GetEventContract>>(response);
     }
 
-    public async Task<EventGetContract> GetEventByIdAsync(int id)
+    public async Task<GetEventContract> GetEventByIdAsync(int id)
     {
         var response = await _eventRepository.GetByIdAsync(id);
         if (response == null)
             throw new ArgumentNullException(nameof(response));
         else
-            return _mapper.Map<EventGetContract>(response);
+            return _mapper.Map<GetEventContract>(response);
+    }
+
+    public async Task<List<GetEventContract>> GetEventsByDayAsync(string date, int userId)
+    {
+        var response = await _eventRepository.GetEventsByDayAsync(date, userId);
+        return _mapper.Map<List<GetEventContract>>(response);
+    }
+
+    public async Task<List<GetEventContract>> GetEventsByMonthAsync(string year, string month, int userId)
+    {
+        var response = await _eventRepository.GetEventsByMonthAsync(year, month, userId);
+        return _mapper.Map<List<GetEventContract>>(response);
     }
 
     public async Task RemoveEventByIdAsync(int id)
@@ -64,7 +75,7 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new InvalidEventDateException(entity.Date);
     }
 
-    public async Task UpdateEventAsync(EventUpdateContract model)
+    public async Task UpdateEventAsync(UpdateEventContract model)
     {
         var entity = _mapper.Map<EventContract>(model);
         await _eventRepository.UpdateAsync(entity);
