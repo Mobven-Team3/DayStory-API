@@ -19,25 +19,27 @@ public class EventController : Controller
 
     [Authorize(Roles = "Admin, User")]
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(EventCreateContract request)
+    public async Task<IActionResult> CreateAsync(CreateEventContract request)
     {
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _eventService.AddEventAsync(request);
-        return Ok();
+        return Ok("Created");
     }
 
     [Authorize(Roles = "Admin, User")]
     [HttpPut]
-    public async Task<IActionResult> UpdateAsync(EventUpdateContract request)
+    public async Task<IActionResult> UpdateAsync(UpdateEventContract request)
     {
         await _eventService.UpdateEventAsync(request);
         return Ok("Updated");
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("get-all/{userId}")]
-    public async Task<IActionResult> GetAllAsync(int userId)
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllAsync()
     {
-        var responseModel = await _eventService.GetAllEventAsync(userId);
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var responseModel = await _eventService.GetEventsAsync(userId);
         return Ok(responseModel);
     }
 
@@ -50,6 +52,24 @@ public class EventController : Controller
     }
 
     [Authorize(Roles = "Admin, User")]
+    [HttpGet("day")]
+    public async Task<IActionResult> GetEventsByDayAsync(GetEventsByDayContract request)
+    {
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var events = await _eventService.GetEventsByDayAsync(request.Date, userId);
+        return Ok(events);
+    }
+
+    [Authorize(Roles = "Admin, User")]
+    [HttpGet("month")]
+    public async Task<IActionResult> GetEventsByMonthAsync(GetEventsByMonthContract request)
+    {
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var events = await _eventService.GetEventsByMonthAsync(request.Year, request.Month, userId);
+        return Ok(events);
+    }
+
+    [Authorize(Roles = "Admin, User")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
@@ -58,7 +78,7 @@ public class EventController : Controller
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("Pages")]
+    [HttpGet("pages")]
     public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
     {
         PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);

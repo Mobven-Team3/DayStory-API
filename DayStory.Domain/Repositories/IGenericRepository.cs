@@ -1,6 +1,7 @@
 ﻿using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Pagination;
+using DayStory.Domain.Specifications;
 
 namespace DayStory.Domain.Repositories;
 
@@ -19,5 +20,6 @@ public interface IGenericRepository<TEntity, TContract>
     Task SaveAsync();
     Task<IQueryable<TEntity>> GetAllAsync();
     Task<TEntity> GetByIdAsync(int id);
+    Task<List<TEntity>> FindAsync(ISpecification<TEntity> specification);
     Task<PagedResponse<TEntity>> GetPagedDataAsync(int pageNumber, int pageSize);
 }

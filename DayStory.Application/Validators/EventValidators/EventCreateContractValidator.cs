@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace DayStory.Application.Validators;
 
-public class EventCreateContractValidator : AbstractValidator<EventCreateContract>
+public class EventCreateContractValidator : AbstractValidator<CreateEventContract>
 {
     public EventCreateContractValidator()
     {

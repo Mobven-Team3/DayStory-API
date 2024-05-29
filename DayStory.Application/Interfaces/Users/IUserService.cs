@@ -5,11 +5,11 @@ namespace DayStory.Application.Interfaces;
 
 public interface IUserService : IBaseService<User, UserContract>
 {
-    Task<string> LoginUserAsync(UserLoginContract requestModel);
-    Task RegisterUserAsync(UserRegisterContract requestModel);
-    Task UpdateUserAsync(UserUpdateContract requestModel);
-    Task UpdatePasswordAsync(UserPasswordUpdateContract requestModel);
+    Task<string> LoginUserAsync(LoginUserContract requestModel);
+    Task RegisterUserAsync(RegisterUserContract requestModel);
+    Task UpdateUserAsync(UpdateUserContract requestModel);
+    Task UpdatePasswordAsync(PasswordUpdateUserContract requestModel);
     string HashPassword(User user, string password);
     bool VerifyPassword(User user, string password);
-    Task<UserGetContract> GetUserAsync(int id);
+    Task<GetUserContract> GetUserAsync(int id);
 }

@@ -1,5 +1,5 @@
 ﻿namespace DayStory.Common.DTOs;
-public class UserPasswordUpdateContract : IBaseContract
+public class PasswordUpdateUserContract : IBaseContract
 {
     public int? Id { get; set; }
     public string CurrentPassword { get; set; }

@@ -2,9 +2,13 @@
 using DayStory.Domain.Entities;
 using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
+using DayStory.Domain.Specifications;
 using DayStory.Infrastructure.Data.Context;
+using DayStory.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DayStory.Infrastructure.Repositories;
 
@@ -38,6 +42,23 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
             throw new ArgumentNullException(typeof(TEntity).ToString());
         }
         return result;
+    }
+
+    public async Task<List<TEntity>> FindAsync(ISpecification<TEntity> specification)
+    {
+        IQueryable<TEntity> query = Table;
+
+        if (specification.Criteria != null)
+        {
+            query = query.Where(specification.Criteria);
+        }
+
+        if (specification.OrderBy != null)
+        {
+            query = specification.OrderBy(query);
+        }
+
+        return await query.ToListAsync();
     }
 
     public async Task<PagedResponse<TEntity>> GetPagedDataAsync(int pageNumber, int pageSize)

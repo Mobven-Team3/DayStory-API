@@ -11,21 +11,21 @@ public class UserMapperProfile : Profile
         CreateMap<User, UserContract>();
         CreateMap<User, UserContract>().ReverseMap();
 
-        CreateMap<User, UserLoginContract>();
-        CreateMap<User, UserLoginContract>().ReverseMap();
+        CreateMap<User, LoginUserContract>();
+        CreateMap<User, LoginUserContract>().ReverseMap();
 
-        CreateMap<User, UserRegisterContract>()
+        CreateMap<User, RegisterUserContract>()
             .ForMember(dest => dest.PasswordConfirmed, opt => opt.Ignore())
             .ForMember(dest => dest.Password, opt => opt.MapFrom(x => x.HashedPassword));
-        CreateMap<User, UserRegisterContract>()
+        CreateMap<User, RegisterUserContract>()
             .ForMember(dest => dest.PasswordConfirmed, opt => opt.Ignore())
             .ForMember(dest => dest.Password, opt => opt.MapFrom(x => x.HashedPassword))
             .ReverseMap();
 
-        CreateMap<UserContract, UserUpdateContract>();
-        CreateMap<UserContract, UserUpdateContract>().ReverseMap();
+        CreateMap<UserContract, UpdateUserContract>();
+        CreateMap<UserContract, UpdateUserContract>().ReverseMap();
 
-        CreateMap<User, UserGetContract>();
-        CreateMap<User, UserGetContract>().ReverseMap();
+        CreateMap<User, GetUserContract>();
+        CreateMap<User, GetUserContract>().ReverseMap();
     }
 }

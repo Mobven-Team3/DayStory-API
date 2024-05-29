@@ -1,6 +1,6 @@
 ﻿namespace DayStory.Common.DTOs;
 
-public class EventGetContract : IBaseContract
+public class UpdateEventContract : IBaseContract
 {
     public int? Id { get; set; }
     public string Title { get; set; }

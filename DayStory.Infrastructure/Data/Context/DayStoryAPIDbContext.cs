@@ -62,7 +62,7 @@ public class DayStoryAPIDbContext : DbContext
         );
 
         //modelBuilder.Entity<User>().HasData(
-        //    new User { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Email = "admin", HashedPassword = "AQAAAAIAAYagAAAAEMAjbf9FW8x1DZZ+AyQXeu64godJj2gAwx6EPpTyTL1El6DlT1fXmkdw/+a81zac3g==", BirthDate = "24-03-1999", Role = "Admin", Gender = 0, CreatedOn = DateTime.UtcNow },
+        //    new User { Id = 1, FirstName = "admin", LastName = "admin", Username = "admin", Email = "admin", HashedPassword = "AQAAAAIAAYagAAAAEMAjbf9FW8x1DZZ+AyQXeu64godJj2gAwx6EPpTyTL1El6DlT1fXmkdw/+a81zac3g==", BirthDate = "00-00-0000", Role = "Admin", Gender = 0, CreatedOn = DateTime.UtcNow },
         //    new User { Id = 2, FirstName = "Nisa", LastName = "Turhan", Username = "nisatur", Email = "nisa@gmail.com", HashedPassword = "AQAAAAIAAYagAAAAEEbO/nyiGYmwOTIe8lSZOx5V0fA3uJCJoajax2zFl9ZSSMbM10M27yrBbwzUPCc6gg==", BirthDate = "24-03-1999", Role = "User", Gender = 1, CreatedOn = DateTime.UtcNow }
         //);
     }

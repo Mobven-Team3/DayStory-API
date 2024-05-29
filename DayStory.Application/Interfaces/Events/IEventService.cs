@@ -7,10 +7,13 @@ namespace DayStory.Application.Interfaces;
 
 public interface IEventService : IBaseService<Event, EventContract>
 {
-    Task AddEventAsync(EventCreateContract model);
+    Task AddEventAsync(CreateEventContract model);
     Task RemoveEventByIdAsync(int id);
-    Task UpdateEventAsync(EventUpdateContract model);
-    Task<List<EventGetContract>> GetAllEventAsync(int userId);
-    Task<EventGetContract> GetEventByIdAsync(int id);
+    Task UpdateEventAsync(UpdateEventContract model);
+    Task<List<GetEventContract>> GetEventsAsync(int userId);
+    Task<GetEventContract> GetEventByIdAsync(int id);
+    Task<List<GetEventContract>> GetEventsByDayAsync(string date, int userId);
+    Task<List<GetEventContract>> GetEventsByMonthAsync(string year, string month, int userId);
+
     //Task<PagedResponse<EventGetContract>> GetPagedEventAsync(int pageNumber, int pageSize);
 }

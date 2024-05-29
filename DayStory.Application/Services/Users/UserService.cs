@@ -24,7 +24,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<string> LoginUserAsync(UserLoginContract requestModel)
+    public async Task<string> LoginUserAsync(LoginUserContract requestModel)
     {
         var user = await _userRepository.UserCheckAsync(requestModel.Email);
         if (user == null)
@@ -40,7 +40,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
             throw new UserPasswordIncorrectException(user.Email);
     }
 
-    public async Task RegisterUserAsync(UserRegisterContract requestModel)
+    public async Task RegisterUserAsync(RegisterUserContract requestModel)
     {
         var userEmailCheck = await _userRepository.UserCheckAsync(requestModel.Email);
         var userUsernameCheck = await _userRepository.UsernameCheckAsync(requestModel.Username);
@@ -58,7 +58,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
         }
     }
 
-    public async Task UpdatePasswordAsync(UserPasswordUpdateContract requestModel)
+    public async Task UpdatePasswordAsync(PasswordUpdateUserContract requestModel)
     {
         var user = await _userRepository.GetByIdAsync(requestModel.Id.Value);
         if (user == null)
@@ -86,15 +86,15 @@ public class UserService : BaseService<User, UserContract>, IUserService
         return _passwordHasher.HashPassword(user, password);
     }
 
-    public async Task UpdateUserAsync(UserUpdateContract requestModel)
+    public async Task UpdateUserAsync(UpdateUserContract requestModel)
     {
         var entity = _mapper.Map<UserContract>(requestModel);
         await _userRepository.UpdateAsync(entity);
     }
 
-    public async Task<UserGetContract> GetUserAsync(int id)
+    public async Task<GetUserContract> GetUserAsync(int id)
     {
         var result = await _userRepository.GetByIdAsync(id);
-        return _mapper.Map<UserGetContract>(result);
+        return _mapper.Map<GetUserContract>(result);
     }
 }

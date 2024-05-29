@@ -1,6 +1,6 @@
 ﻿namespace DayStory.Common.DTOs;
 
-public class UserGetContract : IBaseContract
+public class GetUserContract : IBaseContract
 {
     public int? Id { get; set; }
     public string FirstName { get; set; }
