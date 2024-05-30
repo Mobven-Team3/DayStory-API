@@ -51,19 +51,19 @@ public class AutoFacModule : Module
             .AsImplementedInterfaces()
             .InstancePerLifetimeScope();
 
-        // Redis IDistributedCache
-        containerBuilder.Register(c =>
-        {
-            var config = c.Resolve<IConfiguration>();
-            var options = ConfigurationOptions.Parse(config.GetConnectionString("Redis"), true);
-            return ConnectionMultiplexer.Connect(options);
-        }).As<IConnectionMultiplexer>().SingleInstance();
+        //// Redis IDistributedCache
+        //containerBuilder.Register(c =>
+        //{
+        //    var config = c.Resolve<IConfiguration>();
+        //    var options = ConfigurationOptions.Parse(config.GetConnectionString("Redis"), true);
+        //    return ConnectionMultiplexer.Connect(options);
+        //}).As<IConnectionMultiplexer>().SingleInstance();
 
-        containerBuilder.Register(c => new RedisCache(new RedisCacheOptions
-        {
-            Configuration = c.Resolve<IConfiguration>().GetConnectionString("Redis")
-        })).As<IDistributedCache>().InstancePerLifetimeScope();
+        //containerBuilder.Register(c => new RedisCache(new RedisCacheOptions
+        //{
+        //    Configuration = c.Resolve<IConfiguration>().GetConnectionString("Redis")
+        //})).As<IDistributedCache>().InstancePerLifetimeScope();
 
-        containerBuilder.RegisterType<CacheService>().As<ICacheService>().InstancePerLifetimeScope();
+        //containerBuilder.RegisterType<CacheService>().As<ICacheService>().InstancePerLifetimeScope();
     }
 }

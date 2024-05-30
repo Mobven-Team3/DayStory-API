@@ -31,18 +31,12 @@ builder.Services.AddControllers().AddFluentValidation(fv =>
 
 builder.Services.AddValidatorsFromAssemblyContaining<UserRegisterContractValidator>();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
-//builder.Services.AddScoped<ICacheService, CacheService>();
-
-//builder.Services.AddStackExchangeRedisCache(configure =>
-//{
-//    configure.Configuration = config.GetConnectionString("Redis");
-//});
 builder.Services.AddDbContext<DayStoryAPIDbContext>(builder =>
 {
-    builder.UseSqlServer(config.GetConnectionString("MSSqlConnection"));
+    builder.UseNpgsql(config.GetConnectionString("PostgreSqlConnection"));
 });
 
 builder.Services.AddProblemDetails();
@@ -68,12 +62,12 @@ builder.Host.UseSerilog();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
@@ -99,11 +93,12 @@ void ConfigureLogging()
     Log.Logger = new LoggerConfiguration()
         .Enrich.FromLogContext()
         .Enrich.WithExceptionDetails()
-        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["Elasticsearch:Uri"]))
-        {
-            AutoRegisterTemplate = true,
-            IndexFormat = "log-{0:yyyy.MM.dd}"
-        })
+        .WriteTo.Console()
+        //.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["Elasticsearch:Uri"]))
+        //{
+        //    AutoRegisterTemplate = true,
+        //    IndexFormat = "log-{0:yyyy.MM.dd}"
+        //})
         .Enrich.WithProperty("Environment", environment)
         .ReadFrom.Configuration(configuration)
         .CreateLogger();

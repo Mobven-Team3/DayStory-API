@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DayStory.Domain.Entities;
 
-[Table("Event", Schema = "DayStoryDB")]
+[Table("Event", Schema = "DayStoryDb")]
 public class Event : IBaseEntity, IAuditable
 {
     public int Id { get; set; }

@@ -23,10 +23,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.Gender).IsRequired(true).HasMaxLength(50);
         builder.Property(e => e.Role).IsRequired(true).HasMaxLength(50).HasDefaultValue("User");
         builder.Property(e => e.IsDeleted).HasDefaultValue(false);
-        builder.Property(e => e.CreatedOn).HasDefaultValueSql("getdate()").HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc)).IsRequired();
-        builder.Property(e => e.UpdatedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
-        builder.Property(e => e.DeletedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
-        builder.Property(e => e.LastLogin).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
+        builder.Property(e => e.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP").HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc)).IsRequired();
+        builder.Property(e => e.UpdatedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null).IsRequired(false);
+        builder.Property(e => e.DeletedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null).IsRequired(false);
+        builder.Property(e => e.LastLogin).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null).IsRequired(false);
 
         builder.HasQueryFilter(e => !e.IsDeleted);
     }

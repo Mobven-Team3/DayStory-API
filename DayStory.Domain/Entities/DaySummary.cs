@@ -2,7 +2,7 @@
 
 namespace DayStory.Domain.Entities;
 
-[Table("DaySummary", Schema = "DayStoryDB")]
+[Table("DaySummary", Schema = "DayStoryDb")]
 public class DaySummary : IBaseEntity, IAuditable, ISoftDelete
 {
     public int Id { get; set; }
