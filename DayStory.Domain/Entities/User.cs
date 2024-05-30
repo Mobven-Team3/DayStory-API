@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DayStory.Domain.Entities;
 
-[Table("User", Schema = "DayStoryDB")]
+[Table("User", Schema = "DayStoryDb")]
 public class User : IBaseEntity, IAuditable, ISoftDelete
 {
     public int Id { get; set; }

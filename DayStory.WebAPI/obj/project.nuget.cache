@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Vbf2IJk/RAb0Xu9gDxTAPJmJCjyO3lgBJv1PzHxRiTNGt5X11of8mKSyrvIPNXVnw7aoqX+P3rHXr4tAgmOOfw==",
+  "dgSpecHash": "HgmL1mMjAxkk0v3vkF+elpNRgLZ+CeHfd4BTMj0BFVzUkTcEL7gCTUUKL99rkZxUMNdJsqKlxnpd6wenGVlsDA==",
   "success": true,
   "projectFilePath": "C:\\Users\\nisat\\Desktop\\Mobven\\Team3\\Project\\DayStoryAPI\\DayStory.WebAPI\\DayStory.WebAPI.csproj",
   "expectedPackageFiles": [
@@ -58,6 +58,8 @@
     "C:\\Users\\nisat\\.nuget\\packages\\microsoft.sqlserver.server\\1.0.0\\microsoft.sqlserver.server.1.0.0.nupkg.sha512",
     "C:\\Users\\nisat\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\nisat\\.nuget\\packages\\mono.texttemplating\\2.2.1\\mono.texttemplating.2.2.1.nupkg.sha512",
+    "C:\\Users\\nisat\\.nuget\\packages\\npgsql\\8.0.3\\npgsql.8.0.3.nupkg.sha512",
+    "C:\\Users\\nisat\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\8.0.4\\npgsql.entityframeworkcore.postgresql.8.0.4.nupkg.sha512",
     "C:\\Users\\nisat\\.nuget\\packages\\pipelines.sockets.unofficial\\2.2.8\\pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
     "C:\\Users\\nisat\\.nuget\\packages\\serilog\\3.1.1\\serilog.3.1.1.nupkg.sha512",
     "C:\\Users\\nisat\\.nuget\\packages\\serilog.aspnetcore\\8.0.1\\serilog.aspnetcore.8.0.1.nupkg.sha512",

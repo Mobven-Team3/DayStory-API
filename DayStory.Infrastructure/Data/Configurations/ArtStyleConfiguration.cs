@@ -14,9 +14,9 @@ public class ArtStyleConfiguration : IEntityTypeConfiguration<ArtStyle>
         builder.Property(e => e.Name).IsRequired(true).HasMaxLength(150);
 
         builder.Property(e => e.IsDeleted).HasDefaultValue(false);
-        builder.Property(e => e.CreatedOn).HasDefaultValueSql("getdate()").HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc)).IsRequired();
-        builder.Property(e => e.UpdatedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
-        builder.Property(e => e.DeletedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null);
+        builder.Property(e => e.CreatedOn).HasDefaultValueSql("CURRENT_TIMESTAMP").HasConversion(v => v,v => DateTime.SpecifyKind(v, DateTimeKind.Utc)).IsRequired();
+        builder.Property(e => e.UpdatedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null).IsRequired(false);
+        builder.Property(e => e.DeletedOn).HasConversion(v => v, v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?)null).IsRequired(false);
 
         builder.HasQueryFilter(e => !e.IsDeleted);
     }

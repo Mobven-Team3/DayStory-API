@@ -2,7 +2,7 @@
 
 namespace DayStory.Domain.Entities;
 
-[Table("ArtStyle", Schema = "DayStoryDB")]
+[Table("ArtStyle", Schema = "DayStoryDb")]
 public class ArtStyle : IBaseEntity, IAuditable, ISoftDelete
 {
     public int Id { get; set; }
