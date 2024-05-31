@@ -12,12 +12,12 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
         RuleFor(user => user.FirstName).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
-            .Length(3, 50).WithMessage("{PropertyName} must be between 3 and 50 characters.");
+            .Length(2, 50).WithMessage("{PropertyName} must be between 2 and 50 characters.");
 
         RuleFor(user => user.LastName).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
-            .Length(3, 50).WithMessage("{PropertyName} must be between 3 and 50 characters.");
+            .Length(2, 50).WithMessage("{PropertyName} must be between 2 and 50 characters.");
 
         RuleFor(user => user.Username).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")

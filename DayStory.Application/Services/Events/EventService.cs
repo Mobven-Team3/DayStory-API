@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
@@ -46,16 +47,27 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             return _mapper.Map<GetEventContract>(response);
     }
 
-    public async Task<List<GetEventContract>> GetEventsByDayAsync(string date, int userId)
+    public async Task<List<GetEventContract>> GetEventsByDayAsync(GetEventsByDayContract model)
     {
-        var response = await _eventRepository.GetEventsByDayAsync(date, userId);
-        return _mapper.Map<List<GetEventContract>>(response);
+        if (model != null)
+        {
+            var response = await _eventRepository.GetEventsByDayAsync(model.Date, (int)model.UserId);
+            return _mapper.Map<List<GetEventContract>>(response);
+        }
+        else
+            throw new ArgumentNullException(nameof(model));
+        
     }
 
-    public async Task<List<GetEventContract>> GetEventsByMonthAsync(string year, string month, int userId)
+    public async Task<List<GetEventContract>> GetEventsByMonthAsync(GetEventsByMonthContract model)
     {
-        var response = await _eventRepository.GetEventsByMonthAsync(year, month, userId);
-        return _mapper.Map<List<GetEventContract>>(response);
+        if (model != null)
+        {
+            var response = await _eventRepository.GetEventsByMonthAsync(model.Year, model.Month, (int)model.UserId);
+            return _mapper.Map<List<GetEventContract>>(response);
+        }
+        else
+            throw new ArgumentNullException(nameof(model));
     }
 
     public async Task RemoveEventByIdAsync(int id)

@@ -1,6 +1,8 @@
 ﻿using DayStory.Application.Interfaces;
 using DayStory.Application.Pagination;
+using DayStory.Application.Services;
 using DayStory.Common.DTOs;
+using DayStory.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,32 +13,35 @@ namespace DayStory.WebAPI.Controllers;
 public class DaySummaryController : Controller
 {
     private readonly IDaySummaryService _daySummaryService;
-    public DaySummaryController(IDaySummaryService service)
+    private readonly IConfiguration _configuration;
+    public DaySummaryController(IDaySummaryService service, IConfiguration configuration)
     {
         _daySummaryService = service;
+        _configuration = configuration;
     }
 
     [Authorize(Roles = "Admin, User")]
     [HttpPost]
-    public async Task<IActionResult> CreateAsync(DaySummaryContract request)
+    public async Task<IActionResult> CreateAsync(CreateDaySummaryContract request)
     {
-        await _daySummaryService.AddAsync(request);
-        return Ok();
+        await _daySummaryService.AddDaySummaryAsync(request);
+        return Ok("Created");
     }
 
-    [Authorize(Roles = "Admin, User")]
-    [HttpPut]
-    public async Task<IActionResult> UpdateAsync(DaySummaryContract request)
-    {
-        await _daySummaryService.UpdateAsync(request);
-        return Ok("Updated");
-    }
+    //[Authorize(Roles = "Admin, User")]
+    //[HttpPut]
+    //public async Task<IActionResult> UpdateAsync(DaySummaryContract request)
+    //{
+    //    await _daySummaryService.UpdateAsync(request);
+    //    return Ok("Updated");
+    //}
 
     [Authorize(Roles = "Admin, User")]
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        var responseModel = await _daySummaryService.GetAllAsync();
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var responseModel = await _daySummaryService.GetDaySummariesAsync(userId);
         return Ok(responseModel);
     }
 
@@ -49,19 +54,37 @@ public class DaySummaryController : Controller
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    [HttpGet("day")]
+    public async Task<IActionResult> GetDaySummaryByDayAsync(GetDaySummaryByDayContract request)
     {
-        await _daySummaryService.RemoveByIdAsync(id);
-        return Ok("Delete successful");
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var responseModel = await _daySummaryService.GetDaySummaryByDayAsync(request);
+        return Ok(responseModel);
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("Pages")]
-    public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
+    [HttpGet("month")]
+    public async Task<IActionResult> GetDaySummariesByMonthAsync(GetDaySummariesByMonthContract request)
     {
-        PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
-        var responseModel = await _daySummaryService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var responseModel = await _daySummaryService.GetDaySummariesByMonthAsync(request);
         return Ok(responseModel);
     }
+
+    //[Authorize(Roles = "Admin, User")]
+    //[HttpDelete("{id}")]
+    //public async Task<IActionResult> DeleteAsync(int id)
+    //{
+    //    await _daySummaryService.RemoveByIdAsync(id);
+    //    return Ok("Delete successful");
+    //}
+
+    //[Authorize(Roles = "Admin, User")]
+    //[HttpGet("Pages")]
+    //public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
+    //{
+    //    PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+    //    var responseModel = await _daySummaryService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
+    //    return Ok(responseModel);
+    //}
 }

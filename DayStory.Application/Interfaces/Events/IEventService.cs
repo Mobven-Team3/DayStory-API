@@ -12,8 +12,8 @@ public interface IEventService : IBaseService<Event, EventContract>
     Task UpdateEventAsync(UpdateEventContract model);
     Task<List<GetEventContract>> GetEventsAsync(int userId);
     Task<GetEventContract> GetEventByIdAsync(int id);
-    Task<List<GetEventContract>> GetEventsByDayAsync(string date, int userId);
-    Task<List<GetEventContract>> GetEventsByMonthAsync(string year, string month, int userId);
+    Task<List<GetEventContract>> GetEventsByDayAsync(GetEventsByDayContract model);
+    Task<List<GetEventContract>> GetEventsByMonthAsync(GetEventsByMonthContract model);
 
     //Task<PagedResponse<EventGetContract>> GetPagedEventAsync(int pageNumber, int pageSize);
 }
