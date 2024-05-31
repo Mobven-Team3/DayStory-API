@@ -29,6 +29,7 @@ public class AutoFacModule : Module
         // AutoMapper
         containerBuilder.Register(context => new MapperConfiguration(cfg =>
         {
+            cfg.AddProfile<MapperProfile>();
             cfg.AddProfile<UserMapperProfile>();
             cfg.AddProfile<EventMapperProfile>();
         })).AsSelf().SingleInstance();

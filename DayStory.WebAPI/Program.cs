@@ -31,8 +31,8 @@ builder.Services.AddControllers().AddFluentValidation(fv =>
 
 builder.Services.AddValidatorsFromAssemblyContaining<UserRegisterContractValidator>();
 
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DayStoryAPIDbContext>(builder =>
 {
@@ -62,12 +62,12 @@ builder.Host.UseSerilog();
 
 var app = builder.Build();
 
-//// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 

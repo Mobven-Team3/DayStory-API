@@ -1,7 +1,7 @@
 ﻿namespace DayStory.Common.DTOs;
 
-public class GetEventsByDayContract
+public class CreateDaySummaryContract
 {
-    public string Date { get; set; }
     public int? UserId { get; set; }
+    public string Date { get; set; }
 }

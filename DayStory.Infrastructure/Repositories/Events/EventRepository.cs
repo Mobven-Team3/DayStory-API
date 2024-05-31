@@ -28,12 +28,20 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
     public async Task<List<Event>> GetEventsByDayAsync(string date, int userId)
     {
         var spec = new EventsByDaySpecification(date, userId);
-        return await FindAsync(spec);
+        var result = await FindAsync(spec);
+        if (result != null)
+            return result;
+        else
+            throw new ArgumentNullException(typeof(IQueryable<Event>).ToString());
     }
 
     public async Task<List<Event>> GetEventsByMonthAsync(string year, string month, int userId)
     {
         var spec = new EventsByMonthSpecification(year, month, userId);
-        return await FindAsync(spec);
+        var result = await FindAsync(spec);
+        if (result != null)
+            return result;
+        else
+            throw new ArgumentNullException(typeof(IQueryable<Event>).ToString());
     }
 }

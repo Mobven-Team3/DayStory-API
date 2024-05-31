@@ -5,4 +5,5 @@ namespace DayStory.Application.Interfaces;
 
 public interface IArtStyleService : IBaseService<ArtStyle, ArtStyleContract>
 {
+    Task<ArtStyleContract> GetRandomArtStyleIdAsync();
 }

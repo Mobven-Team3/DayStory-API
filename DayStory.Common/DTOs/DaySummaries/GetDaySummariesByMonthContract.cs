@@ -1,6 +1,6 @@
 ﻿namespace DayStory.Common.DTOs;
 
-public class GetEventsByMonthContract
+public class GetDaySummariesByMonthContract
 {
     public string Year { get; set; }
     public string Month { get; set; }

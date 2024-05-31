@@ -55,8 +55,8 @@ public class EventController : Controller
     [HttpGet("day")]
     public async Task<IActionResult> GetEventsByDayAsync(GetEventsByDayContract request)
     {
-        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
-        var events = await _eventService.GetEventsByDayAsync(request.Date, userId);
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var events = await _eventService.GetEventsByDayAsync(request);
         return Ok(events);
     }
 
@@ -64,8 +64,8 @@ public class EventController : Controller
     [HttpGet("month")]
     public async Task<IActionResult> GetEventsByMonthAsync(GetEventsByMonthContract request)
     {
-        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
-        var events = await _eventService.GetEventsByMonthAsync(request.Year, request.Month, userId);
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var events = await _eventService.GetEventsByMonthAsync(request);
         return Ok(events);
     }
 
@@ -77,12 +77,12 @@ public class EventController : Controller
         return Ok("Delete successful");
     }
 
-    [Authorize(Roles = "Admin, User")]
-    [HttpGet("pages")]
-    public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
-    {
-        PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
-        var responseModel = await _eventService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
-        return Ok(responseModel);
-    }
+    //[Authorize(Roles = "Admin, User")]
+    //[HttpGet("pages")]
+    //public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
+    //{
+    //    PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+    //    var responseModel = await _eventService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
+    //    return Ok(responseModel);
+    //}
 }
