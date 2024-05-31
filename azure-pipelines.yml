@@ -19,11 +19,11 @@ steps:
   displayName: 'Build'
 
 - script: |
-    dotnet publish DayStory.Application/DayStory.Application.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    dotnet publish DayStory.Domain/DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    dotnet publish DayStory.Infrastructure/DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    # dotnet publish DayStory.Application/DayStory.Application.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    # dotnet publish DayStory.Domain/DayStory.Domain.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    # dotnet publish DayStory.Infrastructure/DayStory.Infrastructure.csproj -f net8.0 -c Release --self-contained -r linux-x64
     dotnet publish DayStory.WebAPI/DayStory.WebAPI.csproj -f net8.0 -c Release --self-contained -r linux-x64
-    dotnet publish DayStory.Common/DayStory.Common.csproj -f net8.0 -c Release --self-contained -r linux-x64
+    # dotnet publish DayStory.Common/DayStory.Common.csproj -f net8.0 -c Release --self-contained -r linux-x64
   displayName: 'Publish'
 
 - task: SSH@0
