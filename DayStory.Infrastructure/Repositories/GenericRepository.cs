@@ -121,7 +121,7 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
             throw new DbUpdateException("Entity not found in database.");
 
         if (existEntity is IAuditable at)
-            at.UpdatedOn = DateTime.Now;
+            at.UpdatedOn = DateTime.UtcNow;
 
         _context.Entry(existEntity).CurrentValues.SetValues(model);
         await SaveAsync();

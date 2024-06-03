@@ -1,5 +1,7 @@
-﻿using DayStory.Application.Interfaces;
+﻿using Azure.Core;
+using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
+using DayStory.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +21,7 @@ public class UserController : Controller
     public async Task<IActionResult> RegisterAsync(RegisterUserContract request)
     {
         await _userService.RegisterUserAsync(request);
-        return Ok("Successfully Register");
+        return Ok("Successfully Registered");
     }
 
     [HttpPost("login")]
@@ -33,14 +35,16 @@ public class UserController : Controller
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(UpdateUserContract request)
     {
+        request.Id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _userService.UpdateUserAsync(request);
         return Ok("Updated");
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpPut("password-update")]
+    [HttpPut("password")]
     public async Task<IActionResult> UpdatePasswordAsync(PasswordUpdateUserContract request)
     {
+        request.Id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _userService.UpdatePasswordAsync(request);
         return Ok("Updated");
     }
@@ -54,9 +58,10 @@ public class UserController : Controller
     //}
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetByIdAsync(int id)
+    [HttpGet]
+    public async Task<IActionResult> GetByIdAsync()
     {
+        var id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _userService.GetUserAsync(id);
         return Ok(responseModel);
     }

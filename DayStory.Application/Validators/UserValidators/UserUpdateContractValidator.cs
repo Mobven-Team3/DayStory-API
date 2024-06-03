@@ -27,7 +27,8 @@ public class UserUpdateContractValidator : AbstractValidator<UpdateUserContract>
         RuleFor(user => user.Email).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
-            .EmailAddress().WithMessage("{PropertyName} must be in correct format.");
+            .EmailAddress().WithMessage("{PropertyName} must be in correct format.")
+            .Length(3, 50).WithMessage("{PropertyName} must be between 3 and 50 characters.");
 
         RuleFor(user => user.BirthDate).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")

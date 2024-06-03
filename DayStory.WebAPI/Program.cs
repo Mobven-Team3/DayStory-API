@@ -14,6 +14,7 @@ using Serilog.Sinks.Elasticsearch;
 using FluentValidation.AspNetCore;
 using DayStory.Application.Validators;
 using FluentValidation;
+using DayStory.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
@@ -21,6 +22,17 @@ var config = builder.Configuration;
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(x => x.RegisterModule(new AutoFacModule()));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
 
 // Add services to the container.
 builder.Services.AddControllers().AddFluentValidation(fv =>
@@ -58,6 +70,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+// OpenAI
+builder.Services.AddHttpClient<OpenAIService>();
+builder.Services.AddSingleton(provider =>
+{
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var apiKey = configuration["OpenAI:ApiKey"];
+    var httpClient = provider.GetRequiredService<HttpClient>();
+    return new OpenAIService(httpClient, apiKey);
+});
+
 builder.Host.UseSerilog();
 
 var app = builder.Build();
@@ -72,6 +94,8 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 

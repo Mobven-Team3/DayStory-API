@@ -3,7 +3,6 @@ using DayStory.Common.DTOs;
 using DayStory.Application.Interfaces;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
-using DayStory.Infrastructure.Repositories;
 
 namespace DayStory.Application.Services;
 
@@ -13,27 +12,61 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
     private readonly IEventService _eventService;
     private readonly IArtStyleService _artStyleService;
     private readonly IMapper _mapper;
-    public DaySummaryService(IGenericRepository<DaySummary, DaySummaryContract> repository, IMapper mapper, IDaySummaryRepository daySummaryRepository, IEventService eventService, IArtStyleService artStyleService) : base(repository, mapper)
+    private readonly OpenAIService _openAIService;
+    public DaySummaryService(IGenericRepository<DaySummary, DaySummaryContract> repository, IMapper mapper, IDaySummaryRepository daySummaryRepository, IEventService eventService, IArtStyleService artStyleService, OpenAIService openAIService) : base(repository, mapper)
     {
         _daySummaryRepository = daySummaryRepository;
         _mapper = mapper;
         _eventService = eventService;
         _artStyleService = artStyleService;
+        _openAIService = openAIService;
     }
 
     public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
     {
         var createdModel = _mapper.Map<DaySummaryContract>(model);
-        createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract(){
-                                                                            Date = createdModel.Date,
-                                                                            UserId = createdModel.UserId,
-                                                                        });
+        createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
+        {
+            Date = createdModel.Date,
+            UserId = createdModel.UserId,
+        });
 
         var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
         createdModel.ArtStyleId = (int)randomArtStyle.Id;
 
+        // ChatGPT ile özet alma
+        var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
+        var summary = await _openAIService.GetSummaryAsync(eventsText);
+        createdModel.Summary = summary.Trim();
 
-        throw new NotImplementedException();
+        // DALL-E ile görsel oluşturma
+        var imageBytes = await _openAIService.GenerateImageAsync(summary);
+
+        // Görseli kaydetme
+        var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
+        createdModel.ImagePath = imagePath;
+
+        // Entity'yi veritabanına kaydetme
+        var daySummaryEntity = _mapper.Map<DaySummary>(createdModel);
+        await _daySummaryRepository.AddAsync(daySummaryEntity);
+
+        return createdModel;
+    }
+
+    private string SaveImage(byte[] imageBytes, string date, int? userId)
+    {
+        var folderPath = Path.Combine("wwwroot", "images", "daysummaries", $"{userId}");
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        var fileName = $"{date.Replace("-", "")}_{Guid.NewGuid()}.png";
+        var filePath = Path.Combine(folderPath, fileName);
+
+        File.WriteAllBytes(filePath, imageBytes);
+
+        return filePath;
     }
 
     public async Task<List<GetDaySummaryContract>> GetDaySummariesAsync(int userId)
