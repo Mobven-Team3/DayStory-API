@@ -27,10 +27,12 @@ public class UserService : BaseService<User, UserContract>, IUserService
     public async Task<string> LoginUserAsync(LoginUserContract requestModel)
     {
         var user = await _userRepository.UserCheckAsync(requestModel.Email);
+
         if (user == null)
             throw new UserNotFoundException(requestModel.Email);
 
         var result = VerifyPassword(user, requestModel.Password);
+
         if (result)
         {
             await _userRepository.UserLastLoginUpdateAsync(user);
@@ -44,23 +46,33 @@ public class UserService : BaseService<User, UserContract>, IUserService
     {
         var userEmailCheck = await _userRepository.UserCheckAsync(requestModel.Email);
         var userUsernameCheck = await _userRepository.UsernameCheckAsync(requestModel.Username);
-        if (userEmailCheck == null && !userUsernameCheck)
+
+        if (userEmailCheck != null)
+        {
+            if (userEmailCheck.IsDeleted)
+                await _userRepository.SoftDeletedUserAddAsync(userEmailCheck);
+            else
+                throw new UserAlreadyExistsException(requestModel.Email);
+        }
+        else if (userUsernameCheck)
+        {
+            throw new UserAlreadyExistsException(requestModel.Username);
+        }
+        else
         {
             var entity = _mapper.Map<User>(requestModel);
             entity.HashedPassword = HashPassword(entity, requestModel.Password);
             await _userRepository.AddAsync(entity);
         }
-        else
-        {
-            if(userEmailCheck.IsDeleted == true)
-                await _userRepository.SoftDeletedUserAddAsync(userEmailCheck);
-            throw new UserAlreadyExistsException(requestModel.Email);
-        }
     }
 
     public async Task UpdatePasswordAsync(PasswordUpdateUserContract requestModel)
     {
+        if (requestModel.Id == null)
+            throw new ArgumentNullException(nameof(requestModel.Id), "User ID cannot be null");
+        
         var user = await _userRepository.GetByIdAsync(requestModel.Id.Value);
+
         if (user == null)
             throw new UserNotFoundException(user.Id.ToString());
 
@@ -88,6 +100,14 @@ public class UserService : BaseService<User, UserContract>, IUserService
 
     public async Task UpdateUserAsync(UpdateUserContract requestModel)
     {
+        if (requestModel == null)
+            throw new ArgumentNullException(nameof(requestModel), "Request model cannot be null.");
+
+        var existingUser = await _userRepository.GetByIdAsync((int)requestModel.Id);
+
+        if (existingUser == null)
+            throw new UserNotFoundException(existingUser.Id.ToString());
+
         var entity = _mapper.Map<UserContract>(requestModel);
         await _userRepository.UpdateAsync(entity);
     }
