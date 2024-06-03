@@ -115,6 +115,8 @@ public class UserService : BaseService<User, UserContract>, IUserService
     public async Task<GetUserContract> GetUserAsync(int id)
     {
         var result = await _userRepository.GetByIdAsync(id);
+        if (result == null)
+            throw new UserNotFoundException(id.ToString());
         return _mapper.Map<GetUserContract>(result);
     }
 }

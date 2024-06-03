@@ -19,10 +19,7 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
     public async Task<List<Event>> GetEventsByUserIdAsync(int userId)
     {
         var result = await _dbSet.Where(x => x.UserId == userId).ToListAsync();
-        if (result == null)
-            throw new ArgumentNullException(typeof(IQueryable<Event>).ToString());
-        else
-           return result;
+        return result;
     }
 
     public async Task<List<Event>> GetEventsByDayAsync(string date, int userId)
