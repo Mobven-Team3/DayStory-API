@@ -33,7 +33,7 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         var response = await _eventRepository.GetEventsByUserIdAsync(userId);
         if (response == null)
-            throw new ArgumentNullException(nameof(response));
+            throw new EventNotFoundWithGivenUserIdException(userId.ToString());
         else
             return _mapper.Map<List<GetEventContract>>(response);
     }
@@ -42,7 +42,7 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         var response = await _eventRepository.GetByIdAsync(id);
         if (response == null)
-            throw new ArgumentNullException(nameof(response));
+            throw new EventNotFoundException(id.ToString());
         else
             return _mapper.Map<GetEventContract>(response);
     }
@@ -89,8 +89,14 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
     public async Task UpdateEventAsync(UpdateEventContract model)
     {
-        var entity = _mapper.Map<EventContract>(model);
-        await _eventRepository.UpdateAsync(entity);
+        var existCheck = await _eventRepository.GetByIdAsync((int)model.Id);
+        if (existCheck != null)
+        {
+            var entity = _mapper.Map<EventContract>(model);
+            await _eventRepository.UpdateAsync(entity);
+        }
+        else
+            throw new EventNotFoundException(model.Id.ToString());
     }
 
     //public Task<PagedResponse<EventGetContract>> GetPagedEventAsync(int pageNumber, int pageSize)

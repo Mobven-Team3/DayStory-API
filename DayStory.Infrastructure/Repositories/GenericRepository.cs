@@ -37,10 +37,6 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
     public async Task<TEntity> GetByIdAsync(int id)
     {
         var result = await Table.FindAsync(id);
-        if (result == null)
-        {
-            throw new ArgumentNullException(typeof(TEntity).ToString());
-        }
         return result;
     }
 

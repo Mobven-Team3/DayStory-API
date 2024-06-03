@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DayStory.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bb4d34ffd46dbf63eb63be7bcbbbf48c05dc852")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+76bbc5634dbb6ba3beaba4df726ceac027cd54a1")]
 [assembly: System.Reflection.AssemblyProductAttribute("DayStory.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DayStory.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
