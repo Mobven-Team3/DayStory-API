@@ -1,6 +1,7 @@
 ﻿using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.WebAPI.Helpers;
+using DayStory.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ public class DaySummaryController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _daySummaryService.AddDaySummaryAsync(request);
-        return Ok("Created");
+        return Ok(new ResponseModel("Successfully Created"));
     }
 
     //[Authorize(Roles = "Admin, User")]
@@ -30,7 +31,7 @@ public class DaySummaryController : Controller
     //public async Task<IActionResult> UpdateAsync(DaySummaryContract request)
     //{
     //    await _daySummaryService.UpdateAsync(request);
-    //    return Ok("Updated");
+    //    return Ok(new ResponseModel("Successfully Updated"));
     //}
 
     [Authorize(Roles = "Admin, User")]
@@ -39,7 +40,7 @@ public class DaySummaryController : Controller
     {
         var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummariesAsync(userId);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -47,7 +48,7 @@ public class DaySummaryController : Controller
     public async Task<IActionResult> GetByIdAsync(int id)
     {
         var responseModel = await _daySummaryService.GetByIdAsync(id);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<DaySummaryContract>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -56,7 +57,7 @@ public class DaySummaryController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummaryByDayAsync(request);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<GetDaySummaryContract>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -65,7 +66,7 @@ public class DaySummaryController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummariesByMonthAsync(request);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -73,7 +74,7 @@ public class DaySummaryController : Controller
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await _daySummaryService.RemoveByIdAsync(id);
-        return Ok("Delete successful");
+        return Ok(new ResponseModel("Successfully Deleted"));
     }
 
     //[Authorize(Roles = "Admin, User")]
