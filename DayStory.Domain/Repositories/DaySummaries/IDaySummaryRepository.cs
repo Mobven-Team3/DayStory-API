@@ -8,4 +8,5 @@ public interface IDaySummaryRepository : IGenericRepository<DaySummary, DaySumma
     Task<List<DaySummary>> GetDaySummariesByUserIdAsync(int userId);
     Task<DaySummary> GetDaySummaryByDayAsync(string date, int userId);
     Task<List<DaySummary>> GetDaySummariesByMonthAsync(string year, string month, int userId);
+    Task AddDaySummaryAsync(DaySummary daySummary);
 }

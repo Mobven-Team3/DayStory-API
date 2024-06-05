@@ -71,7 +71,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
         if (requestModel.Id == null)
             throw new ArgumentNullException(nameof(requestModel.Id), "User ID cannot be null");
         
-        var user = await _userRepository.GetByIdAsync(requestModel.Id.Value);
+        var user = await _userRepository.GetByIdAsync(requestModel.Id);
 
         if (user == null)
             throw new UserNotFoundException(user.Id.ToString());

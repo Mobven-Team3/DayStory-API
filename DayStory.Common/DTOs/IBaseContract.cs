@@ -2,5 +2,5 @@
 
 public interface IBaseContract
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
 }

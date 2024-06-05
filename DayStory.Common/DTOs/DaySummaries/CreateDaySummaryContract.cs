@@ -2,6 +2,6 @@
 
 public class CreateDaySummaryContract
 {
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
     public string Date { get; set; }
 }

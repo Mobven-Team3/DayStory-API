@@ -1,9 +1,11 @@
 ﻿using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
+using DayStory.Domain.Specifications;
 using DayStory.Infrastructure.Data.Context;
 using DayStory.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DayStory.Infrastructure.Repositories;
 
@@ -35,10 +37,27 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
     public async Task<List<Event>> GetEventsByMonthAsync(string year, string month, int userId)
     {
         var spec = new EventsByMonthSpecification(year, month, userId);
-        var result = await FindAsync(spec);
+        var result = await FindEventAsync(spec);
         if (result != null)
             return result;
         else
             throw new ArgumentNullException(typeof(IQueryable<Event>).ToString());
+    }
+
+    public async Task<List<Event>> FindEventAsync(ISpecification<Event> specification)
+    {
+        IQueryable<Event> query = _dbSet.Include(x => x.DaySummary).AsNoTracking();
+
+        if (specification.Criteria != null)
+        {
+            query = query.Where(specification.Criteria);
+        }
+
+        if (specification.OrderBy != null)
+        {
+            query = specification.OrderBy(query);
+        }
+
+        return await query.ToListAsync();
     }
 }

@@ -10,10 +10,12 @@ namespace DayStory.Infrastructure.Repositories;
 public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryContract>, IDaySummaryRepository
 {
     private readonly DbSet<DaySummary> _dbSet;
+    private readonly DayStoryAPIDbContext _context;
 
     public DaySummaryRepository(DayStoryAPIDbContext context) : base(context)
     {
         _dbSet = context.Set<DaySummary>();
+        _context = context;
     }
 
     public async Task<List<DaySummary>> GetDaySummariesByUserIdAsync(int userId)
@@ -43,5 +45,16 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
             return result;
         else
             throw new ArgumentNullException(typeof(IQueryable<DaySummary>).ToString());
+    }
+
+    public async Task AddDaySummaryAsync(DaySummary daySummary)
+    {
+        foreach (var eventEntity in daySummary.Events)
+        {
+            _context.Entry(eventEntity).State = EntityState.Unchanged;
+        }
+
+        await _dbSet.AddAsync(daySummary);
+        await _context.SaveChangesAsync();
     }
 }

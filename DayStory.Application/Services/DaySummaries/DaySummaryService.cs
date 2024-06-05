@@ -3,6 +3,7 @@ using DayStory.Common.DTOs;
 using DayStory.Application.Interfaces;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
+using DayStory.Domain.Exceptions;
 
 namespace DayStory.Application.Services;
 
@@ -31,24 +32,38 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
             UserId = createdModel.UserId,
         });
 
+        if (createdModel.Events == null || !createdModel.Events.Any())
+            throw new EventNotFoundWithGivenDateException(model.Date);
+
+        // mehtod adı düzenle
         var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
+        if (randomArtStyle == null)
+            throw new InvalidOperationException("Failed to retrieve a random art style.");
+        
         createdModel.ArtStyleId = (int)randomArtStyle.Id;
 
         // ChatGPT ile özet alma
         var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
         var summary = await _openAIService.GetSummaryAsync(eventsText);
+
+        // Özetin boyutunu kontrol etme ve kesme
+        if (summary.Length > 500)
+        {
+            summary = summary.Substring(0, 497) + "...";
+        }
+
         createdModel.Summary = summary.Trim();
 
-        // DALL-E ile görsel oluşturma
-        var imageBytes = await _openAIService.GenerateImageAsync(summary);
+        //// DALL-E ile görsel oluşturma
+        //var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
 
-        // Görseli kaydetme
-        var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
-        createdModel.ImagePath = imagePath;
+        //// Görseli kaydetme
+        //var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
+        //createdModel.ImagePath = imagePath;
 
         // Entity'yi veritabanına kaydetme
         var daySummaryEntity = _mapper.Map<DaySummary>(createdModel);
-        await _daySummaryRepository.AddAsync(daySummaryEntity);
+        await _daySummaryRepository.AddDaySummaryAsync(daySummaryEntity);
 
         return createdModel;
     }

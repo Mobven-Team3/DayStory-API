@@ -71,12 +71,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 // OpenAI
-builder.Services.AddHttpClient<OpenAIService>();
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<OpenAIService>();
+
 builder.Services.AddSingleton(provider =>
 {
     var configuration = provider.GetRequiredService<IConfiguration>();
     var apiKey = configuration["OpenAI:ApiKey"];
-    var httpClient = provider.GetRequiredService<HttpClient>();
+    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+    var httpClient = httpClientFactory.CreateClient();
     return new OpenAIService(httpClient, apiKey);
 });
 

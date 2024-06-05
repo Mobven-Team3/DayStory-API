@@ -26,7 +26,7 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
 
     public async Task<IQueryable<TEntity>> GetAllAsync()
     {
-        var getQuery = Table;
+        var getQuery = Table.AsNoTracking();
         if (getQuery == null)
         {
             throw new ArgumentNullException(typeof(IQueryable<TEntity>).ToString());
@@ -42,7 +42,7 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
 
     public async Task<List<TEntity>> FindAsync(ISpecification<TEntity> specification)
     {
-        IQueryable<TEntity> query = Table;
+        IQueryable<TEntity> query = Table.AsNoTracking();
 
         if (specification.Criteria != null)
         {

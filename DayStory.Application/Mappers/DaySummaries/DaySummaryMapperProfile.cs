@@ -13,5 +13,8 @@ public class DaySummaryMapperProfile : Profile
 
         CreateMap<DaySummary, GetDaySummaryContract>();
         CreateMap<DaySummary, GetDaySummaryContract>().ReverseMap();
+
+        CreateMap<DaySummaryContract, CreateDaySummaryContract>();
+        CreateMap<DaySummaryContract, CreateDaySummaryContract>().ReverseMap();
     }
 }

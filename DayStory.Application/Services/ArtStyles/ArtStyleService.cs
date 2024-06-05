@@ -27,7 +27,7 @@ public class ArtStyleService : BaseService<ArtStyle, ArtStyleContract>, IArtStyl
         }
 
         int index = _random.Next(artStyles.Count);
-        var response = await _artStyleRepository.GetByIdAsync(index);
+        var response = await _artStyleRepository.GetArtStyleByIdAsync(index);
         return _mapper.Map<ArtStyleContract>(response);
     }
 }
