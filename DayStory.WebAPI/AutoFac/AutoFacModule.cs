@@ -32,6 +32,7 @@ public class AutoFacModule : Module
             cfg.AddProfile<MapperProfile>();
             cfg.AddProfile<UserMapperProfile>();
             cfg.AddProfile<EventMapperProfile>();
+            cfg.AddProfile<DaySummaryMapperProfile>();
         })).AsSelf().SingleInstance();
 
         containerBuilder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();

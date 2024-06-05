@@ -24,6 +24,7 @@ public class DaySummaryController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateAsync(CreateDaySummaryContract request)
     {
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _daySummaryService.AddDaySummaryAsync(request);
         return Ok("Created");
     }
