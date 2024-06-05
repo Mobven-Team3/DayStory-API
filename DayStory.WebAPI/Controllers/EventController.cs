@@ -2,6 +2,7 @@
 using DayStory.Application.Pagination;
 using DayStory.Common.DTOs;
 using DayStory.WebAPI.Helpers;
+using DayStory.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,7 +24,7 @@ public class EventController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _eventService.AddEventAsync(request);
-        return Ok("Created");
+        return Ok(new ResponseModel("Successfully Created"));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -31,7 +32,7 @@ public class EventController : Controller
     public async Task<IActionResult> UpdateAsync(UpdateEventContract request)
     {
         await _eventService.UpdateEventAsync(request);
-        return Ok("Updated");
+        return Ok(new ResponseModel("Successfully Updated"));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -40,7 +41,7 @@ public class EventController : Controller
     {
         var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _eventService.GetEventsAsync(userId);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<List<GetEventContract>>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -48,7 +49,7 @@ public class EventController : Controller
     public async Task<IActionResult> GetByIdAsync(int id)
     {
         var responseModel = await _eventService.GetEventByIdAsync(id);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<GetEventContract>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -56,8 +57,8 @@ public class EventController : Controller
     public async Task<IActionResult> GetEventsByDayAsync(GetEventsByDayContract request)
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
-        var events = await _eventService.GetEventsByDayAsync(request);
-        return Ok(events);
+        var responseModel = await _eventService.GetEventsByDayAsync(request);
+        return Ok(new ResponseModel<List<GetEventContract>>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -65,8 +66,8 @@ public class EventController : Controller
     public async Task<IActionResult> GetEventsByMonthAsync(GetEventsByMonthContract request)
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
-        var events = await _eventService.GetEventsByMonthAsync(request);
-        return Ok(events);
+        var responseModel = await _eventService.GetEventsByMonthAsync(request);
+        return Ok(new ResponseModel<List<GetEventContract>>(responseModel));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -74,7 +75,7 @@ public class EventController : Controller
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await _eventService.RemoveEventByIdAsync(id);
-        return Ok("Delete successful");
+        return Ok(new ResponseModel("Successfully Deleted"));
     }
 
     //[Authorize(Roles = "Admin, User")]
