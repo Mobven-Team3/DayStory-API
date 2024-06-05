@@ -1,11 +1,12 @@
 ﻿using DayStory.Common.DTOs;
+using DayStory.Common.DTOs.Users;
 using DayStory.Domain.Entities;
 
 namespace DayStory.Application.Interfaces;
 
 public interface IUserService : IBaseService<User, UserContract>
 {
-    Task<string> LoginUserAsync(LoginUserContract requestModel);
+    Task<LoginUserResponseContract> LoginUserAsync(LoginUserContract requestModel);
     Task RegisterUserAsync(RegisterUserContract requestModel);
     Task UpdateUserAsync(UpdateUserContract requestModel);
     Task UpdatePasswordAsync(PasswordUpdateUserContract requestModel);

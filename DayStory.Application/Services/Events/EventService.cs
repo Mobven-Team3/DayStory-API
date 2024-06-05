@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using Azure;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
-using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
 using System.Globalization;
 
