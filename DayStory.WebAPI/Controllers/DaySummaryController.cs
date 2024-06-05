@@ -1,6 +1,4 @@
 ﻿using DayStory.Application.Interfaces;
-using DayStory.Application.Pagination;
-using DayStory.Application.Services;
 using DayStory.Common.DTOs;
 using DayStory.WebAPI.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -13,11 +11,9 @@ namespace DayStory.WebAPI.Controllers;
 public class DaySummaryController : Controller
 {
     private readonly IDaySummaryService _daySummaryService;
-    private readonly IConfiguration _configuration;
     public DaySummaryController(IDaySummaryService service, IConfiguration configuration)
     {
         _daySummaryService = service;
-        _configuration = configuration;
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -72,13 +68,13 @@ public class DaySummaryController : Controller
         return Ok(responseModel);
     }
 
-    //[Authorize(Roles = "Admin, User")]
-    //[HttpDelete("{id}")]
-    //public async Task<IActionResult> DeleteAsync(int id)
-    //{
-    //    await _daySummaryService.RemoveByIdAsync(id);
-    //    return Ok("Delete successful");
-    //}
+    [Authorize(Roles = "Admin, User")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync(int id)
+    {
+        await _daySummaryService.RemoveByIdAsync(id);
+        return Ok("Delete successful");
+    }
 
     //[Authorize(Roles = "Admin, User")]
     //[HttpGet("Pages")]

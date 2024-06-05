@@ -2,6 +2,7 @@
 using DayStory.Application.Auth;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
+using DayStory.Common.DTOs.Users;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
 using DayStory.Domain.Repositories;
@@ -24,7 +25,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<string> LoginUserAsync(LoginUserContract requestModel)
+    public async Task<LoginUserResponseContract> LoginUserAsync(LoginUserContract requestModel)
     {
         var user = await _userRepository.UserCheckAsync(requestModel.Email);
 
@@ -36,7 +37,8 @@ public class UserService : BaseService<User, UserContract>, IUserService
         if (result)
         {
             await _userRepository.UserLastLoginUpdateAsync(user);
-            return _authHelper.Token(user);
+            var token = _authHelper.Token(user);
+            return new LoginUserResponseContract { Token = token };
         }
         else
             throw new UserPasswordIncorrectException(user.Email);

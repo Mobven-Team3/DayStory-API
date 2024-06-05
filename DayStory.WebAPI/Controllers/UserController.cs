@@ -1,7 +1,9 @@
 ﻿using Azure.Core;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
+using DayStory.Common.DTOs.Users;
 using DayStory.WebAPI.Helpers;
+using DayStory.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,14 +23,14 @@ public class UserController : Controller
     public async Task<IActionResult> RegisterAsync(RegisterUserContract request)
     {
         await _userService.RegisterUserAsync(request);
-        return Ok("Successfully Registered");
+        return Ok(new ResponseModel("Successfully Registered"));
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync(LoginUserContract request)
     {
         var response = await _userService.LoginUserAsync(request);
-        return Ok(response);
+        return Ok(new ResponseModel<LoginUserResponseContract>(response));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -37,7 +39,7 @@ public class UserController : Controller
     {
         request.Id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _userService.UpdateUserAsync(request);
-        return Ok("Updated");
+        return Ok(new ResponseModel("Successfully Updated"));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -46,7 +48,7 @@ public class UserController : Controller
     {
         request.Id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _userService.UpdatePasswordAsync(request);
-        return Ok("Updated");
+        return Ok(new ResponseModel("Successfully Updated"));
     }
 
     //[Authorize(Roles = "Admin")]
@@ -63,7 +65,7 @@ public class UserController : Controller
     {
         var id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _userService.GetUserAsync(id);
-        return Ok(responseModel);
+        return Ok(new ResponseModel<GetUserContract>(responseModel));
     }
 
     [Authorize(Roles = "Admin")]
@@ -71,6 +73,6 @@ public class UserController : Controller
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await _userService.RemoveByIdAsync(id);
-        return Ok("Delete successful");
+        return Ok(new ResponseModel("Successfully Deleted"));
     }
 }
