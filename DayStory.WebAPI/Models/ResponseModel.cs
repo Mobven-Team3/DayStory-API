@@ -9,44 +9,47 @@ public partial class ResponseModel
         return JsonSerializer.Serialize(this);
     }
 
-    public ResponseModel(string message = null)
+    public ResponseModel(string message = null, int statusCode = 400)
     {
+        StatusCode = statusCode;
         if (string.IsNullOrWhiteSpace(message))
         {
-            Success = true;
+            Message = "An error occurred.";
         }
         else
         {
-            Success = false;
             Message = message;
         }
     }
-    public bool Success { get; set; }
+
+    public int StatusCode { get; set; }
     public string Message { get; set; }
 }
 
 public partial class ResponseModel<T>
 {
-    public bool Success { get; set; }
+    public int StatusCode { get; set; }
     public string Message { get; set; }
-    public T Response { get; set; }
+    public T Data { get; set; }
 
-    public ResponseModel(bool isSuccess)
+    public ResponseModel(int statusCode, string message)
     {
-        Success = isSuccess;
-        Response = default;
-        Message = isSuccess ? "Success" : "Error";
+        StatusCode = statusCode;
+        Message = message;
+        Data = default;
     }
-    public ResponseModel(T data)
+
+    public ResponseModel(T data, int statusCode = 200)
     {
-        Success = true;
-        Response = data;
+        StatusCode = statusCode;
+        Data = data;
         Message = "Success";
     }
-    public ResponseModel(string message)
+
+    public ResponseModel(string message, int statusCode = 400)
     {
-        Success = false;
-        Response = default;
+        StatusCode = statusCode;
+        Data = default;
         Message = message;
     }
 }

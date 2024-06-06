@@ -23,14 +23,14 @@ public class UserController : Controller
     public async Task<IActionResult> RegisterAsync(RegisterUserContract request)
     {
         await _userService.RegisterUserAsync(request);
-        return Ok(new ResponseModel("Successfully Registered"));
+        return Ok(new ResponseModel("Successfully Registered", StatusCodes.Status200OK));
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync(LoginUserContract request)
     {
         var response = await _userService.LoginUserAsync(request);
-        return Ok(new ResponseModel<LoginUserResponseContract>(response));
+        return Ok(new ResponseModel<LoginUserResponseContract>(response, StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -39,7 +39,7 @@ public class UserController : Controller
     {
         request.Id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _userService.UpdateUserAsync(request);
-        return Ok(new ResponseModel("Successfully Updated"));
+        return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -48,7 +48,7 @@ public class UserController : Controller
     {
         request.Id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _userService.UpdatePasswordAsync(request);
-        return Ok(new ResponseModel("Successfully Updated"));
+        return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
     }
 
     //[Authorize(Roles = "Admin")]
@@ -65,7 +65,7 @@ public class UserController : Controller
     {
         var id = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _userService.GetUserAsync(id);
-        return Ok(new ResponseModel<GetUserContract>(responseModel));
+        return Ok(new ResponseModel<GetUserContract>(responseModel, StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin")]
@@ -73,6 +73,6 @@ public class UserController : Controller
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await _userService.RemoveByIdAsync(id);
-        return Ok(new ResponseModel("Successfully Deleted"));
+        return Ok(new ResponseModel("Successfully Deleted", StatusCodes.Status200OK));
     }
 }

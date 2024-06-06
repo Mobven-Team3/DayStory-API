@@ -52,8 +52,8 @@ public class DaySummaryController : Controller
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("day")]
-    public async Task<IActionResult> GetDaySummaryByDayAsync(GetDaySummaryByDayContract request)
+    [HttpGet("day")]    // /api/daysummarys/day?date=05-06-2023
+    public async Task<IActionResult> GetDaySummaryByDayAsync([FromQuery] GetDaySummaryByDayContract request)
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummaryByDayAsync(request);
@@ -61,21 +61,21 @@ public class DaySummaryController : Controller
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("month")]
-    public async Task<IActionResult> GetDaySummariesByMonthAsync(GetDaySummariesByMonthContract request)
+    [HttpGet("month")]  // /api/daysummarys/day?date=05-06-2023
+    public async Task<IActionResult> GetDaySummariesByMonthAsync([FromQuery] GetDaySummariesByMonthContract request)
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummariesByMonthAsync(request);
         return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel));
     }
 
-    [Authorize(Roles = "Admin, User")]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
-    {
-        await _daySummaryService.RemoveByIdAsync(id);
-        return Ok(new ResponseModel("Successfully Deleted"));
-    }
+    //[Authorize(Roles = "Admin, User")]
+    //[HttpDelete("{id}")]
+    //public async Task<IActionResult> DeleteAsync(int id)
+    //{
+    //    await _daySummaryService.RemoveByIdAsync(id);
+    //    return Ok(new ResponseModel("Successfully Deleted"));
+    //}
 
     //[Authorize(Roles = "Admin, User")]
     //[HttpGet("Pages")]
