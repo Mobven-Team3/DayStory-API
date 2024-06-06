@@ -48,7 +48,7 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
             .Must(BeAValidDate).WithMessage("{PropertyName} must be a valid date in the format dd-MM-yyyy.")
-            .Must(BeAValidAge).WithMessage("{PropertyName} must be between 5 and 100 years old.");
+            .Must(BeAValidBirthYear).WithMessage("{PropertyName} must be between 5 and 100 years old.");
 
         RuleFor(user => user.Gender).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
@@ -61,13 +61,22 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
         return DateTime.TryParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
     }
 
-    private bool BeAValidAge(string date)
+    //private bool BeAValidAge(string date)
+    //{
+    //    if (DateTime.TryParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
+    //    {
+    //        var age = DateTime.Now.Year - birthDate.Year;
+    //        if (birthDate > DateTime.Now.AddYears(-age)) age--;
+    //        return age >= 5 && age <= 100;
+    //    }
+    //    return false;
+    //}
+
+    private bool BeAValidBirthYear(string date)
     {
         if (DateTime.TryParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate))
         {
-            var age = DateTime.Now.Year - birthDate.Year;
-            if (birthDate > DateTime.Now.AddYears(-age)) age--;
-            return age >= 5 && age <= 100;
+            return birthDate.Year >= 1924 && birthDate.Year <= 2019;
         }
         return false;
     }
