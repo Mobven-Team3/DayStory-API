@@ -48,7 +48,7 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
             .Must(BeAValidDate).WithMessage("{PropertyName} must be a valid date in the format dd-MM-yyyy.")
-            .Must(BeAValidBirthYear).WithMessage("{PropertyName} must be between 5 and 100 years old.");
+            .Must(BeAValidBirthYear).WithMessage("{PropertyName} must be between the years 1924 and 2019.");
 
         RuleFor(user => user.Gender).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")

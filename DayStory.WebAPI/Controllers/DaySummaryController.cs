@@ -23,7 +23,7 @@ public class DaySummaryController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _daySummaryService.AddDaySummaryAsync(request);
-        return Ok(new ResponseModel("Successfully Created"));
+        return Ok(new ResponseModel("Successfully Created", StatusCodes.Status200OK));
     }
 
     //[Authorize(Roles = "Admin, User")]
@@ -31,7 +31,7 @@ public class DaySummaryController : Controller
     //public async Task<IActionResult> UpdateAsync(DaySummaryContract request)
     //{
     //    await _daySummaryService.UpdateAsync(request);
-    //    return Ok(new ResponseModel("Successfully Updated"));
+    //    return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
     //}
 
     [Authorize(Roles = "Admin, User")]
@@ -40,7 +40,7 @@ public class DaySummaryController : Controller
     {
         var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummariesAsync(userId);
-        return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel));
+        return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel, StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -48,7 +48,7 @@ public class DaySummaryController : Controller
     public async Task<IActionResult> GetByIdAsync(int id)
     {
         var responseModel = await _daySummaryService.GetByIdAsync(id);
-        return Ok(new ResponseModel<DaySummaryContract>(responseModel));
+        return Ok(new ResponseModel<DaySummaryContract>(responseModel, StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -57,7 +57,7 @@ public class DaySummaryController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummaryByDayAsync(request);
-        return Ok(new ResponseModel<GetDaySummaryContract>(responseModel));
+        return Ok(new ResponseModel<GetDaySummaryContract>(responseModel, StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin, User")]
@@ -66,7 +66,7 @@ public class DaySummaryController : Controller
     {
         request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         var responseModel = await _daySummaryService.GetDaySummariesByMonthAsync(request);
-        return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel));
+        return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel, StatusCodes.Status200OK));
     }
 
     //[Authorize(Roles = "Admin, User")]
@@ -74,7 +74,7 @@ public class DaySummaryController : Controller
     //public async Task<IActionResult> DeleteAsync(int id)
     //{
     //    await _daySummaryService.RemoveByIdAsync(id);
-    //    return Ok(new ResponseModel("Successfully Deleted"));
+    //    return Ok(new ResponseModel("Successfully Deleted", StatusCodes.Status200OK));
     //}
 
     //[Authorize(Roles = "Admin, User")]

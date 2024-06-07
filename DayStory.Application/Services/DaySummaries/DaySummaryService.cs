@@ -46,6 +46,13 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
         var summary = await _openAIService.GetSummaryAsync(eventsText);
 
+        // DALL-E ile görsel oluşturma
+        var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
+
+        // Görseli kaydetme
+        var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
+        createdModel.ImagePath = imagePath;
+
         // Özetin boyutunu kontrol etme ve kesme
         if (summary.Length > 500)
         {
@@ -53,13 +60,6 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         }
 
         createdModel.Summary = summary.Trim();
-
-        //// DALL-E ile görsel oluşturma
-        //var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
-
-        //// Görseli kaydetme
-        //var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
-        //createdModel.ImagePath = imagePath;
 
         // Entity'yi veritabanına kaydetme
         var daySummaryEntity = _mapper.Map<DaySummary>(createdModel);

@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using Newtonsoft.Json;
 
@@ -30,7 +31,7 @@ public class OpenAIService
             messages = new[]
         {
             new { role = "system", content = "You are a helpful assistant." },
-            new { role = "user", content = $"Özetle (Türkçe, maksimum 500 karakter):\n{text}" }
+            new { role = "user", content = $"Günü hikayeleştirerek özetle (Türkçe, maksimum 500 karakter):\n{text}" }
         },
             max_tokens = 150, // Yaklaşık 500 karakter
             temperature = 0.7
@@ -54,18 +55,24 @@ public class OpenAIService
 
         var requestBody = new
         {
-            prompt = $"Create an image in {artStyle} style based on the following summary: {summary}",
-            n = 1,
-            size = "512x512"
+            model = "dall-e-3",
+            prompt = $"{artStyle} temasında özeti: {summary} baz alarak hikayeleştirerek tek bir fotoğraf karesi oluştur.",
+            size = "1024x1024",
+            quality = "standard",
+            n = 1
         };
 
         request.Content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
 
         var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"Failed to generate image: {response.StatusCode} {errorContent}");
+        }
 
         var responseContent = await response.Content.ReadAsStringAsync();
-        dynamic responseObject = JsonConvert.DeserializeObject(responseContent);
+        var responseObject = JsonConvert.DeserializeObject<OpenAIImageResponse>(responseContent);
 
         var imageUrl = responseObject.data[0].url;
         return await _httpClient.GetByteArrayAsync(imageUrl);
