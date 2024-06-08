@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Azure;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
+using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
 using System.Globalization;
 
@@ -20,6 +22,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
     public async Task AddEventAsync(CreateEventContract model)
     {
+        var checkDate = CheckDate(model.Date);
+        if (!checkDate)
+            throw new EventDateException(model.Date);
+
         var entity = _mapper.Map<Event>(model);
         if(entity != null)
             await _eventRepository.AddAsync(entity);
@@ -36,13 +42,14 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             return _mapper.Map<List<GetEventContract>>(response);
     }
 
-    public async Task<GetEventContract> GetEventByIdAsync(int id)
+    public async Task<GetEventContract> GetEventByIdAsync(int id, int userId)
     {
-        var response = await _eventRepository.GetByIdAsync(id);
-        if (response == null)
+        var entity = await _eventRepository.GetByIdAsync(id);
+
+        if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
-        else
-            return _mapper.Map<GetEventContract>(response);
+
+        return _mapper.Map<GetEventContract>(entity);
     }
 
     public async Task<List<GetEventContract>> GetEventsByDayAsync(GetEventsByDayContract model)
@@ -68,11 +75,15 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new ArgumentNullException(nameof(model));
     }
 
-    public async Task RemoveEventByIdAsync(int id)
+    public async Task RemoveEventByIdAsync(int id, int userId)
     {
         var entity = await _eventRepository.GetByIdAsync(id);
-        if (entity == null)
+        if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
+
+        var checkDate = CheckDate(entity.Date);
+        if (!checkDate)
+            throw new EventDateException(entity.Date);
 
         if (DateTime.TryParseExact(entity.Date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime eventDate))
         {
@@ -87,8 +98,12 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
     public async Task UpdateEventAsync(UpdateEventContract model)
     {
+        var checkDate = CheckDate(model.Date);
+        if (!checkDate)
+            throw new EventDateException(model.Date);
+
         var existCheck = await _eventRepository.GetByIdAsync((int)model.Id);
-        if (existCheck != null)
+        if (existCheck != null && model.UserId == existCheck.UserId)
         {
             var entity = _mapper.Map<EventContract>(model);
             await _eventRepository.UpdateAsync(entity);
@@ -97,8 +112,15 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new EventNotFoundException(model.Id.ToString());
     }
 
-    //public Task<PagedResponse<EventGetContract>> GetPagedEventAsync(int pageNumber, int pageSize)
-    //{
-    //    throw new NotImplementedException();
-    //}
+    private bool CheckDate(string date)
+    {
+        DateTime parsedDate;
+
+        if (DateTime.TryParseExact(date, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out parsedDate))
+        {
+            return parsedDate.Date == DateTime.Today;
+        }
+        else
+            throw new InvalidEventDateException(date);
+    }
 }
