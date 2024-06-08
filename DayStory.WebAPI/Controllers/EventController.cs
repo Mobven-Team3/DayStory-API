@@ -78,12 +78,12 @@ public class EventController : Controller
         return Ok(new ResponseModel("Successfully Deleted", StatusCodes.Status200OK));
     }
 
-    //[Authorize(Roles = "Admin, User")]
-    //[HttpGet("pages")]
-    //public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
-    //{
-    //    PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
-    //    var responseModel = await _eventService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
-    //    return Ok(responseModel);
-    //}
+    [Authorize(Roles = "Admin, User")]
+    [HttpGet("pages")]
+    public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
+    {
+        PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+        var responseModel = await _eventService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
+        return Ok(responseModel);
+    }
 }

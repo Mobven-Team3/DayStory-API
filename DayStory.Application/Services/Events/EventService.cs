@@ -3,6 +3,7 @@ using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
+using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
 using System.Globalization;
 
@@ -20,6 +21,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
     public async Task AddEventAsync(CreateEventContract model)
     {
+        var checkDate = CheckDate(model.Date);
+        if (!checkDate)
+            throw new EventDateException(model.Date);
+
         var entity = _mapper.Map<Event>(model);
         if(entity != null)
             await _eventRepository.AddAsync(entity);
@@ -74,6 +79,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         if (entity == null)
             throw new EventNotFoundException(id.ToString());
 
+        var checkDate = CheckDate(entity.Date);
+        if (!checkDate)
+            throw new EventDateException(entity.Date);
+
         if (DateTime.TryParseExact(entity.Date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime eventDate))
         {
             if (eventDate >= DateTime.Today)
@@ -87,6 +96,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
     public async Task UpdateEventAsync(UpdateEventContract model)
     {
+        var checkDate = CheckDate(model.Date);
+        if (!checkDate)
+            throw new EventDateException(model.Date);
+
         var existCheck = await _eventRepository.GetByIdAsync((int)model.Id);
         if (existCheck != null)
         {
@@ -97,8 +110,20 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new EventNotFoundException(model.Id.ToString());
     }
 
-    //public Task<PagedResponse<EventGetContract>> GetPagedEventAsync(int pageNumber, int pageSize)
-    //{
-    //    throw new NotImplementedException();
-    //}
+    public Task<PagedResponse<GetEventContract>> GetPagedEventAsync(int pageNumber, int pageSize)
+    {
+        throw new NotImplementedException();
+    }
+
+    private bool CheckDate(string date)
+    {
+        DateTime parsedDate;
+
+        if (DateTime.TryParseExact(date, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out parsedDate))
+        {
+            return parsedDate.Date == DateTime.Today;
+        }
+        else
+            throw new InvalidEventDateException(date);
+    }
 }

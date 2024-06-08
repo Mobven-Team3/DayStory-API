@@ -1,4 +1,5 @@
 ﻿using DayStory.Application.Interfaces;
+using DayStory.Application.Pagination;
 using DayStory.Common.DTOs;
 using DayStory.WebAPI.Helpers;
 using DayStory.WebAPI.Models;
@@ -77,12 +78,12 @@ public class DaySummaryController : Controller
     //    return Ok(new ResponseModel("Successfully Deleted", StatusCodes.Status200OK));
     //}
 
-    //[Authorize(Roles = "Admin, User")]
-    //[HttpGet("Pages")]
-    //public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
-    //{
-    //    PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
-    //    var responseModel = await _daySummaryService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
-    //    return Ok(responseModel);
-    //}
+    [Authorize(Roles = "Admin, User")]
+    [HttpGet("Pages")]
+    public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
+    {
+        PaginationFilter paginationFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+        var responseModel = await _daySummaryService.GetPagedDataAsync(paginationFilter.PageNumber, paginationFilter.PageSize);
+        return Ok(responseModel);
+    }
 }
