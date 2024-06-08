@@ -31,6 +31,7 @@ public class EventController : Controller
     [HttpPut]
     public async Task<IActionResult> UpdateAsync(UpdateEventContract request)
     {
+        request.UserId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
         await _eventService.UpdateEventAsync(request);
         return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
     }
@@ -45,10 +46,11 @@ public class EventController : Controller
     }
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet("{id}")]
+    [HttpGet("{Id}")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var responseModel = await _eventService.GetEventByIdAsync(id);
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var responseModel = await _eventService.GetEventByIdAsync(id, userId);
         return Ok(new ResponseModel<GetEventContract>(responseModel, StatusCodes.Status200OK));
     }
 
@@ -74,7 +76,8 @@ public class EventController : Controller
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        await _eventService.RemoveEventByIdAsync(id);
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        await _eventService.RemoveEventByIdAsync(id, userId);
         return Ok(new ResponseModel("Successfully Deleted", StatusCodes.Status200OK));
     }
 

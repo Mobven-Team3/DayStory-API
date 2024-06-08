@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
@@ -41,13 +42,14 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             return _mapper.Map<List<GetEventContract>>(response);
     }
 
-    public async Task<GetEventContract> GetEventByIdAsync(int id)
+    public async Task<GetEventContract> GetEventByIdAsync(int id, int userId)
     {
-        var response = await _eventRepository.GetByIdAsync(id);
-        if (response == null)
+        var entity = await _eventRepository.GetByIdAsync(id);
+
+        if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
-        else
-            return _mapper.Map<GetEventContract>(response);
+
+        return _mapper.Map<GetEventContract>(entity);
     }
 
     public async Task<List<GetEventContract>> GetEventsByDayAsync(GetEventsByDayContract model)
@@ -73,10 +75,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new ArgumentNullException(nameof(model));
     }
 
-    public async Task RemoveEventByIdAsync(int id)
+    public async Task RemoveEventByIdAsync(int id, int userId)
     {
         var entity = await _eventRepository.GetByIdAsync(id);
-        if (entity == null)
+        if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
 
         var checkDate = CheckDate(entity.Date);
@@ -101,18 +103,13 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new EventDateException(model.Date);
 
         var existCheck = await _eventRepository.GetByIdAsync((int)model.Id);
-        if (existCheck != null)
+        if (existCheck != null && model.UserId == existCheck.UserId)
         {
             var entity = _mapper.Map<EventContract>(model);
             await _eventRepository.UpdateAsync(entity);
         }
         else
             throw new EventNotFoundException(model.Id.ToString());
-    }
-
-    public Task<PagedResponse<GetEventContract>> GetPagedEventAsync(int pageNumber, int pageSize)
-    {
-        throw new NotImplementedException();
     }
 
     private bool CheckDate(string date)
