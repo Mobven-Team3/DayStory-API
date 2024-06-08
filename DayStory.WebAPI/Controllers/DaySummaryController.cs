@@ -12,7 +12,7 @@ namespace DayStory.WebAPI.Controllers;
 public class DaySummaryController : Controller
 {
     private readonly IDaySummaryService _daySummaryService;
-    public DaySummaryController(IDaySummaryService service, IConfiguration configuration)
+    public DaySummaryController(IDaySummaryService service)
     {
         _daySummaryService = service;
     }

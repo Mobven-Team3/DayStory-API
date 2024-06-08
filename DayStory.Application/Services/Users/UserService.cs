@@ -29,7 +29,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
     {
         var user = await _userRepository.UserCheckAsync(requestModel.Email);
 
-        if (user == null)
+        if (user == null || user.IsDeleted)
             throw new UserNotFoundException(requestModel.Email);
 
         var result = VerifyPassword(user, requestModel.Password);

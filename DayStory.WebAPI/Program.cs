@@ -23,15 +23,23 @@ var config = builder.Configuration;
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(x => x.RegisterModule(new AutoFacModule()));
 
+var dayStoryUrl = config["DayStory:Url"];
+
+if (string.IsNullOrWhiteSpace(dayStoryUrl))
+{
+    throw new InvalidOperationException("DayStory:Url is not configured. Please check your configuration.");
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-        builder =>
+        corsBuilder =>
         {
-            builder.WithOrigins("https://talent.mobven.com:6003/")
-                   .AllowAnyOrigin()
-                   .AllowAnyHeader()
-                   .AllowAnyMethod();
+            corsBuilder
+                     //.WithOrigins(dayStoryUrl)
+                       .AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
         });
 });
 

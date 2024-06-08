@@ -1,4 +1,6 @@
-﻿namespace DayStory.Common.DTOs;
+﻿using DayStory.Common.Enums;
+
+namespace DayStory.Common.DTOs;
 
 public class UpdateUserContract : IBaseContract
 {
@@ -8,5 +10,5 @@ public class UpdateUserContract : IBaseContract
     public string Username { get; set; }
     public string Email { get; set; }
     public string BirthDate { get; set; }
-    public string Gender { get; set; }
+    public Gender Gender { get; set; }
 }
