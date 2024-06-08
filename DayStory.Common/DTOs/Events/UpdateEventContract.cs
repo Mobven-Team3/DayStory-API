@@ -1,4 +1,6 @@
-﻿namespace DayStory.Common.DTOs;
+﻿using DayStory.Common.Enums;
+
+namespace DayStory.Common.DTOs;
 
 public class UpdateEventContract : IBaseContract
 {
@@ -7,5 +9,6 @@ public class UpdateEventContract : IBaseContract
     public string? Description { get; set; }
     public string Date { get; set; }
     public string? Time { get; set; }
-    public string Priority { get; set; }
+    public Priority Priority { get; set; }
+    public int UserId { get; set; }
 }

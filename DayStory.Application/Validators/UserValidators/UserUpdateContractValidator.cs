@@ -13,13 +13,13 @@ public class UserUpdateContractValidator : AbstractValidator<UpdateUserContract>
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
             .Length(2, 50).WithMessage("{PropertyName} must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z]+$").WithMessage("{PropertyName} must contain only letters.");
+            .Matches(@"^[a-zA-ZçÇğĞıİöÖşŞüÜ ]+$").WithMessage("{PropertyName} must contain only letters.");
 
         RuleFor(user => user.LastName).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
             .Length(2, 50).WithMessage("{PropertyName} must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z]+$").WithMessage("{PropertyName} must contain only letters.");
+            .Matches(@"^[a-zA-ZçÇğĞıİöÖşŞüÜ ]+$").WithMessage("{PropertyName} must contain only letters.");
 
         RuleFor(user => user.Username).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
@@ -42,17 +42,12 @@ public class UserUpdateContractValidator : AbstractValidator<UpdateUserContract>
         RuleFor(user => user.Gender).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
-            .Must(BeAValidGender).WithMessage("{PropertyName} must be a valid gender.");
+            .IsInEnum().WithMessage("{PropertyName} must be a valid gender.");
     }
 
     private bool BeAValidDate(string date)
     {
         return DateTime.TryParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
-    }
-
-    private bool BeAValidGender(string gender)
-    {
-        return Enum.TryParse(typeof(Gender), gender, true, out _);
     }
 
     private bool BeAValidBirthYear(string date)

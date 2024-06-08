@@ -13,13 +13,13 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
             .Length(2, 50).WithMessage("{PropertyName} must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z]+$").WithMessage("{PropertyName} must contain only letters.");
+            .Matches(@"^[a-zA-ZçÇğĞıİöÖşŞüÜ ]+$").WithMessage("{PropertyName} must contain only letters.");
 
         RuleFor(user => user.LastName).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
             .Length(2, 50).WithMessage("{PropertyName} must be between 2 and 50 characters.")
-            .Matches(@"^[a-zA-Z]+$").WithMessage("{PropertyName} must contain only letters.");
+            .Matches(@"^[a-zA-ZçÇğĞıİöÖşŞüÜ ]+$").WithMessage("{PropertyName} must contain only letters.");
 
         RuleFor(user => user.Username).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
@@ -53,7 +53,7 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
         RuleFor(user => user.Gender).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
-            .Must(BeAValidGender).WithMessage("{PropertyName} must be a valid gender.");
+            .IsInEnum().WithMessage("{PropertyName} must be a valid gender.");
     }
 
     private bool BeAValidDate(string date)
@@ -79,11 +79,6 @@ public class UserRegisterContractValidator : AbstractValidator<RegisterUserContr
             return birthDate.Year >= 1924 && birthDate.Year <= 2019;
         }
         return false;
-    }
-
-    private bool BeAValidGender(string gender)
-    {
-        return Enum.TryParse(typeof(Gender), gender, true, out _);
     }
 
     private bool NotContainTurkishCharacters(string email)
