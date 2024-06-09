@@ -86,7 +86,7 @@ builder.Services.AddSingleton<OpenAIService>();
 builder.Services.AddSingleton(provider =>
 {
     var configuration = provider.GetRequiredService<IConfiguration>();
-    var apiKey = configuration["OpenAI:ApiKey"];
+    var apiKey = config["OpenAI:ApiKey"];
 
     if (string.IsNullOrWhiteSpace(apiKey))
     {
