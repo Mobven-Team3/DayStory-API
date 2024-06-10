@@ -4,6 +4,7 @@ using DayStory.Application.Interfaces;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Domain.Exceptions;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace DayStory.Application.Services;
 
@@ -25,6 +26,8 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
     public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
     {
+        //EnsureDateIsPreviousDay(model.Date);
+
         var createdModel = _mapper.Map<DaySummaryContract>(model);
         createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
         {
@@ -88,7 +91,7 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
     {
         var response = await _daySummaryRepository.GetDaySummariesByUserIdAsync(userId);
         if (response == null)
-            throw new ArgumentNullException(nameof(response));
+            throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString());
         else
             return _mapper.Map<List<GetDaySummaryContract>>(response);
     }
@@ -113,5 +116,18 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         }
         else
             throw new ArgumentNullException(nameof(model));
+    }
+
+    private void EnsureDateIsPreviousDay(string dateString)
+    {
+        if (!DateTime.TryParse(dateString, out var date))
+        {
+            throw new InvalidDaySummaryDateException(dateString);
+        }
+
+        if (date.Date != DateTime.UtcNow.Date.AddDays(-1))
+        {
+            throw new DaySummaryDateException(dateString);
+        }
     }
 }

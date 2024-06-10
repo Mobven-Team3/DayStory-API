@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using DayStory.Application.Constants;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using Newtonsoft.Json;
@@ -31,7 +32,7 @@ public class OpenAIService
             messages = new[]
         {
             new { role = "system", content = "You are a helpful assistant." },
-            new { role = "user", content = $"Günü hikayeleştirerek özetle (Türkçe, maksimum 500 karakter):\n{text}" }
+            new { role = "user", content = OpenAIPrompts.GetSummaryPrompt(text)}
         },
             max_tokens = 150, // Yaklaşık 500 karakter
             temperature = 0.7
@@ -56,7 +57,7 @@ public class OpenAIService
         var requestBody = new
         {
             model = "dall-e-3",
-            prompt = $"{artStyle} temasında özeti: {summary} baz alarak hikayeleştirerek tek bir fotoğraf karesi oluştur.",
+            prompt = OpenAIPrompts.GetImagePrompt(summary, artStyle),
             size = "1024x1024",
             quality = "standard",
             n = 1

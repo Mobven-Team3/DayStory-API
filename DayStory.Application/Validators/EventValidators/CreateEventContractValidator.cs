@@ -27,7 +27,8 @@ public class CreateEventContractValidator : AbstractValidator<CreateEventContrac
             .Must(BeAValidTime).When(x => x.Time != null).WithMessage("{PropertyName} must be a valid time in the format HH:mm.");
 
         RuleFor(x => x.Priority).Cascade(CascadeMode.StopOnFirstFailure)
-            .IsInEnum().When(x => x.Time != null).WithMessage("{PropertyName} must be a valid priority.");
+            .IsInEnum().When(x => x.Time != null).WithMessage("{PropertyName} must be a valid priority.")
+            .When(x => x.Priority != 0);
     }
     private bool BeAValidDate(string date)
     {

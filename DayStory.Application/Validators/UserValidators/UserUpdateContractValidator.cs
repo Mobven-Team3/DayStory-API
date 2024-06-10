@@ -42,7 +42,8 @@ public class UserUpdateContractValidator : AbstractValidator<UpdateUserContract>
         RuleFor(user => user.Gender).Cascade(CascadeMode.StopOnFirstFailure)
             .NotNull().WithMessage("{PropertyName} required.")
             .NotEmpty().WithMessage("{PropertyName} required.")
-            .IsInEnum().WithMessage("{PropertyName} must be a valid gender.");
+            .IsInEnum().WithMessage("{PropertyName} must be a valid gender.")
+            .When(user => user.Gender != 0);
     }
 
     private bool BeAValidDate(string date)
