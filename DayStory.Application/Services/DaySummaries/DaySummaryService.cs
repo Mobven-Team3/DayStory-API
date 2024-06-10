@@ -4,7 +4,6 @@ using DayStory.Application.Interfaces;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Domain.Exceptions;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace DayStory.Application.Services;
 
@@ -26,7 +25,7 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
     public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
     {
-        //EnsureDateIsPreviousDay(model.Date);
+        EnsureDateIsPreviousDay(model.Date);
 
         var createdModel = _mapper.Map<DaySummaryContract>(model);
         createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
@@ -94,6 +93,15 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
             throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString());
         else
             return _mapper.Map<List<GetDaySummaryContract>>(response);
+    }
+
+    public async Task<GetDaySummaryContract> GetDaySummaryByIdAsync(int id, int userId)
+    {
+        var entity = await _daySummaryRepository.GetByIdAsync(id);
+        if (entity == null || entity.UserId != userId)
+            throw new DaySummaryNotFoundException(id.ToString());
+        else
+            return _mapper.Map<GetDaySummaryContract>(entity);
     }
 
     public async Task<List<GetDaySummaryContract>> GetDaySummariesByMonthAsync(GetDaySummariesByMonthContract model)

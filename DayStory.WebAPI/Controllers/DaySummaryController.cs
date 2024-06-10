@@ -36,7 +36,7 @@ public class DaySummaryController : Controller
     //}
 
     [Authorize(Roles = "Admin, User")]
-    [HttpGet]
+    [HttpGet("all")]
     public async Task<IActionResult> GetAllAsync()
     {
         var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
@@ -48,8 +48,9 @@ public class DaySummaryController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var responseModel = await _daySummaryService.GetByIdAsync(id);
-        return Ok(new ResponseModel<DaySummaryContract>(responseModel, StatusCodes.Status200OK));
+        var userId = int.Parse(JwtHelper.GetUserIdFromToken(HttpContext));
+        var responseModel = await _daySummaryService.GetDaySummaryByIdAsync(id, userId);
+        return Ok(new ResponseModel<GetDaySummaryContract>(responseModel, StatusCodes.Status200OK));
     }
 
     [Authorize(Roles = "Admin, User")]
