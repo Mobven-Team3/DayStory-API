@@ -106,6 +106,9 @@ public class UserService : BaseService<User, UserContract>, IUserService
 
     public async Task UpdateUserAsync(UpdateUserContract requestModel)
     {
+        requestModel.Email = requestModel.Email.ToLowerInvariant();
+        requestModel.Username = requestModel.Username.ToLower();
+
         if (requestModel == null)
             throw new ArgumentNullException(nameof(requestModel), "Request model cannot be null.");
 
