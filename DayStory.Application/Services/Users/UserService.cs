@@ -27,6 +27,7 @@ public class UserService : BaseService<User, UserContract>, IUserService
 
     public async Task<LoginUserResponseContract> LoginUserAsync(LoginUserContract requestModel)
     {
+        requestModel.Email = requestModel.Email.ToLowerInvariant();
         var user = await _userRepository.UserCheckAsync(requestModel.Email);
 
         if (user == null || user.IsDeleted)
@@ -46,6 +47,9 @@ public class UserService : BaseService<User, UserContract>, IUserService
 
     public async Task RegisterUserAsync(RegisterUserContract requestModel)
     {
+        requestModel.Email = requestModel.Email.ToLowerInvariant();
+        requestModel.Username = requestModel.Username.ToLower();
+
         var userEmailCheck = await _userRepository.UserCheckAsync(requestModel.Email);
         var userUsernameCheck = await _userRepository.UsernameCheckAsync(requestModel.Username);
 
