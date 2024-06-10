@@ -36,7 +36,6 @@ builder.Services.AddCors(options =>
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(x => x.RegisterModule(new AutoFacModule()));
 
-// Add services to the container.
 builder.Services.AddControllers().AddFluentValidation(fv =>
 {
     fv.DisableDataAnnotationsValidation = true;
