@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DayStory.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d8bc49ae01605a998987e73eac892ca007aa171c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1900de708d8839cd5cc90da1130b8023cf7a8c79")]
 [assembly: System.Reflection.AssemblyProductAttribute("DayStory.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DayStory.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

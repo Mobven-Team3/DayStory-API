@@ -53,19 +53,20 @@ public class AutoFacModule : Module
             .AsImplementedInterfaces()
             .InstancePerLifetimeScope();
 
-        //// Redis IDistributedCache
-        //containerBuilder.Register(c =>
-        //{
-        //    var config = c.Resolve<IConfiguration>();
-        //    var options = ConfigurationOptions.Parse(config.GetConnectionString("Redis"), true);
-        //    return ConnectionMultiplexer.Connect(options);
-        //}).As<IConnectionMultiplexer>().SingleInstance();
+        // OpenAI
+        containerBuilder.Register(context =>
+        {
+            var configuration = context.Resolve<IConfiguration>();
+            var apiKey = configuration["OpenAI:ApiKey"];
 
-        //containerBuilder.Register(c => new RedisCache(new RedisCacheOptions
-        //{
-        //    Configuration = c.Resolve<IConfiguration>().GetConnectionString("Redis")
-        //})).As<IDistributedCache>().InstancePerLifetimeScope();
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ArgumentNullException("OpenAI:ApiKey", "API key is not configured. Please check your configuration.");
+            }
 
-        //containerBuilder.RegisterType<CacheService>().As<ICacheService>().InstancePerLifetimeScope();
+            var httpClientFactory = context.Resolve<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            return new OpenAIService(httpClient, apiKey);
+        }).AsSelf().SingleInstance();
     }
 }

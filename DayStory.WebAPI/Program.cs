@@ -2,7 +2,6 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
 using DayStory.Infrastructure.Data.Context;
-using MovieAPI.WebAPI.AutoFac;
 using DayStory.Application.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -15,20 +14,11 @@ using FluentValidation.AspNetCore;
 using DayStory.Application.Validators;
 using FluentValidation;
 using DayStory.Application.Services;
+using MovieAPI.WebAPI.AutoFac;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
 var config = builder.Configuration;
-
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Host.ConfigureContainer<ContainerBuilder>(x => x.RegisterModule(new AutoFacModule()));
-
-var dayStoryUrl = config["DayStory:Url"];
-
-if (string.IsNullOrWhiteSpace(dayStoryUrl))
-{
-    throw new InvalidOperationException("DayStory:Url is not configured. Please check your configuration.");
-}
 
 builder.Services.AddCors(options =>
 {
@@ -36,12 +26,14 @@ builder.Services.AddCors(options =>
         corsBuilder =>
         {
             corsBuilder
-                     //.WithOrigins(dayStoryUrl)
                        .AllowAnyOrigin()
                        .AllowAnyHeader()
                        .AllowAnyMethod();
         });
 });
+
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+builder.Host.ConfigureContainer<ContainerBuilder>(x => x.RegisterModule(new AutoFacModule()));
 
 // Add services to the container.
 builder.Services.AddControllers().AddFluentValidation(fv =>
@@ -83,21 +75,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<OpenAIService>();
 
-builder.Services.AddSingleton(provider =>
-{
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    var apiKey = config["OpenAI:ApiKey"];
-
-    if (string.IsNullOrWhiteSpace(apiKey))
-    {
-        throw new ArgumentNullException("OpenAI:ApiKey", "API key is not configured. Please check your configuration.");
-    }
-
-    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-    var httpClient = httpClientFactory.CreateClient();
-    return new OpenAIService(httpClient, apiKey);
-});
-
 builder.Host.UseSerilog();
 
 var app = builder.Build();
@@ -110,17 +87,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
-
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 app.UseCors("AllowAllOrigins");
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
 
 void ConfigureLogging()
