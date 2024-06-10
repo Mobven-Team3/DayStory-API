@@ -26,8 +26,8 @@ builder.Services.AddCors(options =>
         corsBuilder =>
         {
             corsBuilder
-                       .WithOrigins("https://talent.mobven.com:6003/")
-                       //.AllowAnyOrigin()
+                       //.WithOrigins("https://talent.mobven.com:6003/")
+                       .AllowAnyOrigin()
                        .AllowAnyHeader()
                        .AllowAnyMethod();
         });
