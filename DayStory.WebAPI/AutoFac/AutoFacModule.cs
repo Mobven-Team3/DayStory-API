@@ -26,14 +26,17 @@ public class AutoFacModule : Module
         containerBuilder.RegisterType<AuthHelper>().As<IAuthHelper>().InstancePerLifetimeScope();
         containerBuilder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>().InstancePerLifetimeScope();
 
-        // AutoMapper
-        containerBuilder.Register(context => new MapperConfiguration(cfg =>
+        containerBuilder.Register(context =>
         {
-            cfg.AddProfile<MapperProfile>();
-            cfg.AddProfile<UserMapperProfile>();
-            cfg.AddProfile<EventMapperProfile>();
-            cfg.AddProfile<DaySummaryMapperProfile>();
-        })).AsSelf().SingleInstance();
+            var config = context.Resolve<IConfiguration>();
+            return new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MapperProfile());
+                cfg.AddProfile(new UserMapperProfile());
+                cfg.AddProfile(new EventMapperProfile());
+                cfg.AddProfile(new DaySummaryMapperProfile(config));
+            });
+        }).AsSelf().SingleInstance();
 
         containerBuilder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve)).As<IMapper>().InstancePerLifetimeScope();
 
