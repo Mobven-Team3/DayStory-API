@@ -2,13 +2,9 @@
 using DayStory.Domain.Entities;
 using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
-using DayStory.Domain.Specifications;
 using DayStory.Infrastructure.Data.Context;
-using DayStory.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DayStory.Infrastructure.Repositories;
 
@@ -27,34 +23,21 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
     public async Task<IQueryable<TEntity>> GetAllAsync()
     {
         var getQuery = Table.AsNoTracking();
-        if (getQuery == null)
-        {
+
+        if (getQuery != null)
+            return await Task.FromResult(getQuery);
+        else
             throw new ArgumentNullException(typeof(IQueryable<TEntity>).ToString());
-        }
-        return await Task.FromResult(getQuery);
     }
 
     public async Task<TEntity> GetByIdAsync(int id)
     {
         var result = await Table.FindAsync(id);
-        return result;
-    }
 
-    public async Task<List<TEntity>> FindAsync(ISpecification<TEntity> specification)
-    {
-        IQueryable<TEntity> query = Table.AsNoTracking();
-
-        if (specification.Criteria != null)
-        {
-            query = query.Where(specification.Criteria);
-        }
-
-        if (specification.OrderBy != null)
-        {
-            query = specification.OrderBy(query);
-        }
-
-        return await query.ToListAsync();
+        if (result != null)
+            return result;
+        else
+            throw new ArgumentNullException();
     }
 
     public async Task<PagedResponse<TEntity>> GetPagedDataAsync(int pageNumber, int pageSize)
@@ -71,6 +54,7 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
         return new PagedResponse<TEntity>(pageSize, pageNumber, totalRecords, totalPages, entities);
     }
 

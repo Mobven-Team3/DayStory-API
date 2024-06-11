@@ -24,12 +24,14 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         EnsureDateIsToday(model.Date);
 
         var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+
         if (existingDaySummary != null)
         {
             throw new DaySummaryAlreadyExistsException(model.Date);
         }
 
         var entity = _mapper.Map<Event>(model);
+
         if(entity != null)
             await _eventRepository.AddAsync(entity);
         else
@@ -39,10 +41,8 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     public async Task<List<GetEventContract>> GetEventsAsync(int userId)
     {
         var response = await _eventRepository.GetEventsByUserIdAsync(userId);
-        if (response == null)
-            throw new EventNotFoundWithGivenUserIdException(userId.ToString());
-        else
-            return _mapper.Map<List<GetEventContract>>(response);
+
+        return _mapper.Map<List<GetEventContract>>(response);
     }
 
     public async Task<GetEventContract> GetEventByIdAsync(int id, int userId)
@@ -59,7 +59,8 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         if (model != null)
         {
-            var response = await _eventRepository.GetEventsByDayAsync(model.Date, (int)model.UserId);
+            var response = await _eventRepository.GetEventsByDayAsync(model.Date, model.UserId);
+
             return _mapper.Map<List<GetEventContract>>(response);
         }
         else
@@ -71,7 +72,8 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         if (model != null)
         {
-            var response = await _eventRepository.GetEventsByMonthAsync(model.Year, model.Month, (int)model.UserId);
+            var response = await _eventRepository.GetEventsByMonthAsync(model.Year, model.Month, model.UserId);
+
             return _mapper.Map<List<GetEventContract>>(response);
         }
         else
@@ -81,16 +83,16 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     public async Task RemoveEventByIdAsync(int id, int userId)
     {
         var entity = await _eventRepository.GetByIdAsync(id);
+
         if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
 
         EnsureDateIsToday(entity.Date);
 
         var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(entity.Date, userId);
+
         if (existingDaySummary != null)
-        {
             throw new DaySummaryAlreadyExistsException(entity.Date);
-        }
 
         await _eventRepository.RemoveByIdAsync(id);
     }
@@ -100,15 +102,18 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         EnsureDateIsToday(model.Date);
 
         var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+
         if (existingDaySummary != null)
         {
             throw new DaySummaryAlreadyExistsException(model.Date);
         }
 
         var existCheck = await _eventRepository.GetByIdAsync(model.Id);
+
         if (existCheck != null && model.UserId == existCheck.UserId)
         {
             var entity = _mapper.Map<EventContract>(model);
+
             await _eventRepository.UpdateAsync(entity);
         }
         else
