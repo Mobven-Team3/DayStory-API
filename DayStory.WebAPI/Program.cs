@@ -87,10 +87,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseStaticFiles();
 app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseStaticFiles();   //???
 app.MapControllers();
 app.Run();
 
