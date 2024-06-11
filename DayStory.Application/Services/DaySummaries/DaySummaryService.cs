@@ -25,6 +25,14 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
     public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
     {
+        EnsureDateIsToday(model.Date);
+
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+        if (existingDaySummary != null)
+        {
+            throw new DaySummaryAlreadyExistsException(model.Date);
+        }
+
         var createdModel = _mapper.Map<DaySummaryContract>(model);
         createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
         {
@@ -35,25 +43,20 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         if (createdModel.Events == null || !createdModel.Events.Any())
             throw new EventNotFoundWithGivenDateException(model.Date);
 
-        // mehtod adı düzenle
         var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
         if (randomArtStyle == null)
             throw new InvalidOperationException("Failed to retrieve a random art style.");
         
         createdModel.ArtStyleId = (int)randomArtStyle.Id;
 
-        // ChatGPT ile özet alma
         var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
         var summary = await _openAIService.GetSummaryAsync(eventsText);
 
-        // DALL-E ile görsel oluşturma
         var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
 
-        // Görseli kaydetme
         var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
         createdModel.ImagePath = imagePath;
 
-        // Özetin boyutunu kontrol etme ve kesme
         if (summary.Length > 500)
         {
             summary = summary.Substring(0, 497) + "...";
@@ -61,7 +64,6 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
         createdModel.Summary = summary.Trim();
 
-        // Entity'yi veritabanına kaydetme
         var daySummaryEntity = _mapper.Map<DaySummary>(createdModel);
         await _daySummaryRepository.AddDaySummaryAsync(daySummaryEntity);
 
@@ -88,9 +90,18 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
     {
         var response = await _daySummaryRepository.GetDaySummariesByUserIdAsync(userId);
         if (response == null)
-            throw new ArgumentNullException(nameof(response));
+            throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString());
         else
             return _mapper.Map<List<GetDaySummaryContract>>(response);
+    }
+
+    public async Task<GetDaySummaryContract> GetDaySummaryByIdAsync(int id, int userId)
+    {
+        var entity = await _daySummaryRepository.GetByIdAsync(id);
+        if (entity == null || entity.UserId != userId)
+            throw new DaySummaryNotFoundException(id.ToString());
+        else
+            return _mapper.Map<GetDaySummaryContract>(entity);
     }
 
     public async Task<List<GetDaySummaryContract>> GetDaySummariesByMonthAsync(GetDaySummariesByMonthContract model)
@@ -113,5 +124,18 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         }
         else
             throw new ArgumentNullException(nameof(model));
+    }
+
+    private void EnsureDateIsToday(string dateString)
+    {
+        if (!DateTime.TryParse(dateString, out var date))
+        {
+            throw new InvalidDaySummaryDateException(dateString);
+        }
+
+        if (date.Date != DateTime.UtcNow.Date)
+        {
+            throw new DaySummaryDateException(dateString);
+        }
     }
 }
