@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using Azure;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
-using DayStory.Domain.Pagination;
 using DayStory.Domain.Repositories;
-using System.Globalization;
 
 namespace DayStory.Application.Services;
 
@@ -14,17 +11,23 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 {
     private readonly IEventRepository _eventRepository;
     private readonly IMapper _mapper;
-    public EventService(IGenericRepository<Event, EventContract> repository, IMapper mapper, IEventRepository eventRepository) : base(repository, mapper)
+    private readonly IDaySummaryRepository _daySummaryRepository;
+    public EventService(IGenericRepository<Event, EventContract> repository, IMapper mapper, IEventRepository eventRepository, IDaySummaryRepository daySummaryRepository) : base(repository, mapper)
     {
         _eventRepository = eventRepository;
         _mapper = mapper;
+        _daySummaryRepository = daySummaryRepository;
     }
 
     public async Task AddEventAsync(CreateEventContract model)
     {
-        var checkDate = CheckDate(model.Date);
-        if (!checkDate)
-            throw new EventDateException(model.Date);
+        EnsureDateIsToday(model.Date);
+
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+        if (existingDaySummary != null)
+        {
+            throw new DaySummaryAlreadyExistsException(model.Date);
+        }
 
         var entity = _mapper.Map<Event>(model);
         if(entity != null)
@@ -81,28 +84,28 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
 
-        var checkDate = CheckDate(entity.Date);
-        if (!checkDate)
-            throw new EventDateException(entity.Date);
+        EnsureDateIsToday(entity.Date);
 
-        if (DateTime.TryParseExact(entity.Date, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime eventDate))
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(entity.Date, userId);
+        if (existingDaySummary != null)
         {
-            if (eventDate >= DateTime.Today)
-                await _eventRepository.RemoveByIdAsync(id);
-            else
-                throw new InvalidEventDateException(eventDate.ToString("dd-MM-yyyy"));
+            throw new DaySummaryAlreadyExistsException(entity.Date);
         }
-        else
-            throw new InvalidEventDateException(entity.Date);
+
+        await _eventRepository.RemoveByIdAsync(id);
     }
 
     public async Task UpdateEventAsync(UpdateEventContract model)
     {
-        var checkDate = CheckDate(model.Date);
-        if (!checkDate)
-            throw new EventDateException(model.Date);
+        EnsureDateIsToday(model.Date);
 
-        var existCheck = await _eventRepository.GetByIdAsync((int)model.Id);
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+        if (existingDaySummary != null)
+        {
+            throw new DaySummaryAlreadyExistsException(model.Date);
+        }
+
+        var existCheck = await _eventRepository.GetByIdAsync(model.Id);
         if (existCheck != null && model.UserId == existCheck.UserId)
         {
             var entity = _mapper.Map<EventContract>(model);
@@ -112,15 +115,16 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new EventNotFoundException(model.Id.ToString());
     }
 
-    private bool CheckDate(string date)
+    private void EnsureDateIsToday(string date)
     {
-        DateTime parsedDate;
-
-        if (DateTime.TryParseExact(date, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out parsedDate))
+        if (!DateTime.TryParseExact(date, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out var parsedDate))
         {
-            return parsedDate.Date == DateTime.Today;
-        }
-        else
             throw new InvalidEventDateException(date);
+        }
+
+        if (parsedDate.Date != DateTime.Today)
+        {
+            throw new EventDateException(date);
+        }
     }
 }

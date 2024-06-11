@@ -25,7 +25,13 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
     public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
     {
-        EnsureDateIsPreviousDay(model.Date);
+        EnsureDateIsToday(model.Date);
+
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+        if (existingDaySummary != null)
+        {
+            throw new DaySummaryAlreadyExistsException(model.Date);
+        }
 
         var createdModel = _mapper.Map<DaySummaryContract>(model);
         createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
@@ -37,25 +43,20 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         if (createdModel.Events == null || !createdModel.Events.Any())
             throw new EventNotFoundWithGivenDateException(model.Date);
 
-        // mehtod adı düzenle
         var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
         if (randomArtStyle == null)
             throw new InvalidOperationException("Failed to retrieve a random art style.");
         
         createdModel.ArtStyleId = (int)randomArtStyle.Id;
 
-        // ChatGPT ile özet alma
         var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
         var summary = await _openAIService.GetSummaryAsync(eventsText);
 
-        // DALL-E ile görsel oluşturma
         var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
 
-        // Görseli kaydetme
         var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
         createdModel.ImagePath = imagePath;
 
-        // Özetin boyutunu kontrol etme ve kesme
         if (summary.Length > 500)
         {
             summary = summary.Substring(0, 497) + "...";
@@ -63,7 +64,6 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
         createdModel.Summary = summary.Trim();
 
-        // Entity'yi veritabanına kaydetme
         var daySummaryEntity = _mapper.Map<DaySummary>(createdModel);
         await _daySummaryRepository.AddDaySummaryAsync(daySummaryEntity);
 
@@ -126,14 +126,14 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
             throw new ArgumentNullException(nameof(model));
     }
 
-    private void EnsureDateIsPreviousDay(string dateString)
+    private void EnsureDateIsToday(string dateString)
     {
         if (!DateTime.TryParse(dateString, out var date))
         {
             throw new InvalidDaySummaryDateException(dateString);
         }
 
-        if (date.Date != DateTime.UtcNow.Date.AddDays(-1))
+        if (date.Date != DateTime.UtcNow.Date)
         {
             throw new DaySummaryDateException(dateString);
         }
