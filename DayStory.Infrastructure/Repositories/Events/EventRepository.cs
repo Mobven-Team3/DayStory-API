@@ -20,10 +20,7 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
     {
         var result = await _dbSet.Where(x => x.UserId == userId).ToListAsync();
 
-        if (result != null)
-            return result;
-        else
-            throw new EventNotFoundWithGivenUserIdException(userId.ToString());
+        return result;
     }
 
     public async Task<List<Event>> GetEventsByDayAsync(string date, int userId)
@@ -34,10 +31,7 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
             .OrderBy(x => x.Id)
             .ToListAsync();
 
-        if (result != null)
-            return result;
-        else
-            throw new EventNotFoundWithGivenDateException(date);
+        return result;
     }
 
     public async Task<List<Event>> GetEventsByMonthAsync(string year, string month, int userId)
@@ -47,9 +41,6 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
             .OrderBy(x => x.Date)
             .ToListAsync();
 
-        if (result != null)
-            return result;
-        else
-            throw new EventNotFoundWithGivenDateException(month);
+        return result;
     }
 }

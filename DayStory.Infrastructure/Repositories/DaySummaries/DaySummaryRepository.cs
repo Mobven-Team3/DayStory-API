@@ -24,20 +24,14 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
             .AsNoTracking()
             .ToListAsync();
 
-        if(result != null)
-            return result;
-        else
-            throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString());
+        return result;
     }
 
     public async Task<DaySummary> GetDaySummaryByDayAsync(string date, int userId)
     {
         var result = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Date == date && x.UserId == userId);
 
-        if (result != null)
-            return result;
-        else
-            throw new DaySummaryNotFoundWithGivenDateException(date);
+        return result;
     }
 
     public async Task<List<DaySummary>> GetDaySummariesByMonthAsync(string year, string month, int userId)
@@ -48,10 +42,7 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
             .OrderBy(x => x.Id)
             .ToListAsync();
 
-        if (result != null)
-            return result;
-        else
-            throw new DaySummaryNotFoundWithGivenDateException(month);
+        return result;
     }
 
     public async Task AddDaySummaryAsync(DaySummary daySummary)

@@ -114,7 +114,11 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         if (model != null)
         {
             var response = await _daySummaryRepository.GetDaySummariesByMonthAsync(model.Year, model.Month, (int)model.UserId);
-            return _mapper.Map<List<GetDaySummaryContract>>(response);
+
+            if (response != null)
+                return _mapper.Map<List<GetDaySummaryContract>>(response);
+            else
+                throw new DaySummaryNotFoundWithGivenDateException(model.Month);
         }
         else
             throw new ArgumentNullException(nameof(model));
@@ -125,7 +129,11 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         if (model != null)
         {
             var response = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, (int)model.UserId);
-            return _mapper.Map<GetDaySummaryContract>(response);
+
+            if (response != null)
+                return _mapper.Map<GetDaySummaryContract>(response);
+            else
+                throw new DaySummaryNotFoundWithGivenDateException(model.Date);
         }
         else
             throw new ArgumentNullException(nameof(model));
