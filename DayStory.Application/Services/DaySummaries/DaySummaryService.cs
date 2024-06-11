@@ -58,10 +58,7 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
         createdModel.ImagePath = imagePath;
 
-        if (summary.Length > 500)
-        {
-            summary = summary.Substring(0, 497) + "...";
-        }
+        summary = (summary.Length > 500) ? summary.Substring(0, 497) + "..." : summary;
 
         createdModel.Summary = summary.Trim();
 
