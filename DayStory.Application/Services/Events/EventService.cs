@@ -42,7 +42,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         var response = await _eventRepository.GetEventsByUserIdAsync(userId);
 
-        return _mapper.Map<List<GetEventContract>>(response);
+        if (response == null)
+            throw new EventNotFoundWithGivenUserIdException(userId.ToString());
+        else
+            return _mapper.Map<List<GetEventContract>>(response);
     }
 
     public async Task<GetEventContract> GetEventByIdAsync(int id, int userId)
@@ -61,7 +64,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         {
             var response = await _eventRepository.GetEventsByDayAsync(model.Date, model.UserId);
 
-            return _mapper.Map<List<GetEventContract>>(response);
+            if (response != null)
+                return _mapper.Map<List<GetEventContract>>(response);
+            else
+                throw new EventNotFoundWithGivenDateException(model.Date);
         }
         else
             throw new ArgumentNullException(nameof(model));
@@ -74,7 +80,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         {
             var response = await _eventRepository.GetEventsByMonthAsync(model.Year, model.Month, model.UserId);
 
-            return _mapper.Map<List<GetEventContract>>(response);
+            if (response != null)
+                return _mapper.Map<List<GetEventContract>>(response);
+            else
+                throw new EventNotFoundWithGivenDateException(model.Month);
         }
         else
             throw new ArgumentNullException(nameof(model));
