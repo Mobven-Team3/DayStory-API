@@ -4,6 +4,7 @@ using DayStory.Application.Interfaces;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Domain.Exceptions;
+using System.Globalization;
 
 namespace DayStory.Application.Services;
 
@@ -128,7 +129,7 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
     private void EnsureDateIsToday(string dateString)
     {
-        if (!DateTime.TryParse(dateString, out var date))
+        if (!DateTime.TryParseExact(dateString, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
         {
             throw new InvalidDaySummaryDateException(dateString);
         }
