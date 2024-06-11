@@ -3,9 +3,7 @@ using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
 using DayStory.Domain.Repositories;
 using DayStory.Infrastructure.Data.Context;
-using DayStory.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DayStory.Infrastructure.Repositories;
 
@@ -22,25 +20,38 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
 
     public async Task<List<DaySummary>> GetDaySummariesByUserIdAsync(int userId)
     {
-        var result = await _dbSet.Where(x => x.UserId == userId).ToListAsync();
+        var result = await _dbSet.Where(x => x.UserId == userId)
+            .AsNoTracking()
+            .ToListAsync();
 
-        return result;
+        if(result != null)
+            return result;
+        else
+            throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString());
     }
 
     public async Task<DaySummary> GetDaySummaryByDayAsync(string date, int userId)
     {
-        var spec = new DaySummaryByDaySpecification(date, userId);
-        var result = await FindAsync(spec);
+        var result = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Date == date && x.UserId == userId);
 
-        return result.FirstOrDefault();
+        if (result != null)
+            return result;
+        else
+            throw new DaySummaryNotFoundWithGivenDateException(date);
     }
 
     public async Task<List<DaySummary>> GetDaySummariesByMonthAsync(string year, string month, int userId)
     {
-        var spec = new DaySummariesByMonthSpecification(year, month, userId);
-        var result = await FindAsync(spec);
+        var result = await _dbSet.Where(e => e.Date.Substring(6, 4) == year && e.Date.Substring(3, 2) == month && e.UserId == userId)
+            .AsNoTracking()
+            .OrderBy(x => x.Date)
+            .OrderBy(x => x.Id)
+            .ToListAsync();
 
-        return result;
+        if (result != null)
+            return result;
+        else
+            throw new DaySummaryNotFoundWithGivenDateException(month);
     }
 
     public async Task AddDaySummaryAsync(DaySummary daySummary)

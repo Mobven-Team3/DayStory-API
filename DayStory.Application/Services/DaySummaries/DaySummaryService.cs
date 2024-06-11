@@ -26,15 +26,17 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
 
     public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
     {
+        // Check if the date is today
         EnsureDateIsToday(model.Date);
 
+        // Checks if there is a daysummary created
         var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
         if (existingDaySummary != null)
-        {
             throw new DaySummaryAlreadyExistsException(model.Date);
-        }
 
         var createdModel = _mapper.Map<DaySummaryContract>(model);
+
+        // Get Events on the entered date
         createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
         {
             Date = createdModel.Date,
@@ -44,20 +46,25 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         if (createdModel.Events == null || !createdModel.Events.Any())
             throw new EventNotFoundWithGivenDateException(model.Date);
 
+        // Get random theme
         var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
         if (randomArtStyle == null)
             throw new InvalidOperationException("Failed to retrieve a random art style.");
         
-        createdModel.ArtStyleId = (int)randomArtStyle.Id;
+        createdModel.ArtStyleId = randomArtStyle.Id;
 
+        // Sending events to AI and creating a day summary
         var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
         var summary = await _openAIService.GetSummaryAsync(eventsText);
 
+        // Sending summary to AI and creating a image
         var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
 
+        // Save image to path
         var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
         createdModel.ImagePath = imagePath;
 
+        // Characters are limited to 500
         summary = (summary.Length > 500) ? summary.Substring(0, 497) + "..." : summary;
 
         createdModel.Summary = summary.Trim();

@@ -1,11 +1,9 @@
 ﻿using DayStory.Common.DTOs;
 using DayStory.Domain.Entities;
+using DayStory.Domain.Exceptions;
 using DayStory.Domain.Repositories;
-using DayStory.Domain.Specifications;
 using DayStory.Infrastructure.Data.Context;
-using DayStory.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DayStory.Infrastructure.Repositories;
 
@@ -21,43 +19,37 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
     public async Task<List<Event>> GetEventsByUserIdAsync(int userId)
     {
         var result = await _dbSet.Where(x => x.UserId == userId).ToListAsync();
-        return result;
+
+        if (result != null)
+            return result;
+        else
+            throw new EventNotFoundWithGivenUserIdException(userId.ToString());
     }
 
     public async Task<List<Event>> GetEventsByDayAsync(string date, int userId)
     {
-        var spec = new EventsByDaySpecification(date, userId);
-        var result = await FindAsync(spec);
+        var result = await _dbSet.Where(x => x.Date ==  date && x.UserId == userId)
+            .AsNoTracking()
+            .OrderBy(x => x.Time)
+            .OrderBy(x => x.Id)
+            .ToListAsync();
+
         if (result != null)
             return result;
         else
-            throw new ArgumentNullException(typeof(IQueryable<Event>).ToString());
+            throw new EventNotFoundWithGivenDateException(date);
     }
 
     public async Task<List<Event>> GetEventsByMonthAsync(string year, string month, int userId)
     {
-        var spec = new EventsByMonthSpecification(year, month, userId);
-        var result = await FindEventAsync(spec);
+        var result = await _dbSet.Where(e => e.Date.Substring(6, 4) == year && e.Date.Substring(3, 2) == month && e.UserId == userId)
+            .AsNoTracking()
+            .OrderBy(x => x.Date)
+            .ToListAsync();
+
         if (result != null)
             return result;
         else
-            throw new ArgumentNullException(typeof(IQueryable<Event>).ToString());
-    }
-
-    public async Task<List<Event>> FindEventAsync(ISpecification<Event> specification)
-    {
-        IQueryable<Event> query = _dbSet.Include(x => x.DaySummary).AsNoTracking();
-
-        if (specification.Criteria != null)
-        {
-            query = query.Where(specification.Criteria);
-        }
-
-        if (specification.OrderBy != null)
-        {
-            query = specification.OrderBy(query);
-        }
-
-        return await query.ToListAsync();
+            throw new EventNotFoundWithGivenDateException(month);
     }
 }
