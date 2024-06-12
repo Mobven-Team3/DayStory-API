@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DayStory.Application.Auth;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
 using DayStory.Common.DTOs.Users;
@@ -14,36 +13,28 @@ public class UserService : BaseService<User, UserContract>, IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
-    private readonly IAuthHelper _authHelper;
-    private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly IAuthService _authService;
 
     public UserService(
         IGenericRepository<User, UserContract> repository, 
         IMapper mapper, 
-        IUserRepository userRepository, 
-        IAuthHelper authHelper, 
-        IPasswordHasher<User> passwordHasher) : base(repository, mapper)
+        IUserRepository userRepository,
+        IAuthService authService) : base(repository, mapper)
     {
         _userRepository = userRepository;
         _mapper = mapper;
-        _authHelper = authHelper;
-        _passwordHasher = passwordHasher;
+        _authService = authService;
     }
 
     public async Task<LoginUserResponseContract> LoginUserAsync(LoginUserContract requestModel)
     {
-        requestModel.Email = requestModel.Email.ToLowerInvariant();
-        var user = await _userRepository.UserCheckAsync(requestModel.Email);
+        requestModel.Email = NormalizeEmail(requestModel.Email);
+        var user = await GetUserByEmailAsync(requestModel.Email);
 
-        if (user == null || user.IsDeleted)
-            throw new UserNotFoundException(requestModel.Email);
-
-        var result = VerifyPassword(user, requestModel.Password);
-
-        if (result)
+        if (_authService.VerifyPassword(user, requestModel.Password))
         {
-            await _userRepository.UserLastLoginUpdateAsync(user);
-            var token = _authHelper.Token(user);
+            await UpdateUserLastLoginAsync(user);
+            var token = GenerateToken(user);
             return new LoginUserResponseContract { Token = token };
         }
         else
@@ -52,81 +43,106 @@ public class UserService : BaseService<User, UserContract>, IUserService
 
     public async Task RegisterUserAsync(RegisterUserContract requestModel)
     {
-        requestModel.Email = requestModel.Email.ToLowerInvariant();
-        requestModel.Username = requestModel.Username.ToLower();
+        requestModel.Email = NormalizeEmail(requestModel.Email);
+        requestModel.Username = NormalizeUsername(requestModel.Username);
 
-        var userEmailCheck = await _userRepository.UserCheckAndSoftDeletedUserAddAsync(requestModel.Email);
-        var userUsernameCheck = await _userRepository.UsernameCheckAsync(requestModel.Username);
+        await CheckAndHandleExistingUserAsync(requestModel.Email, requestModel.Username);
 
-        if (userEmailCheck != null)
-        {
-            throw new UserAlreadyExistsException(requestModel.Email);
-        }
-        else if (userUsernameCheck)
-        {
-            throw new UserAlreadyExistsException(requestModel.Username);
-        }
-        else
-        {
-            var entity = _mapper.Map<User>(requestModel);
-            entity.HashedPassword = HashPassword(entity, requestModel.Password);
-            await _userRepository.AddAsync(entity);
-        }
+        var newUser = CreateUser(requestModel);
+        await _userRepository.AddAsync(newUser);
     }
 
     public async Task UpdatePasswordAsync(PasswordUpdateUserContract requestModel)
     {
-        var user = await _userRepository.GetByIdAsync(requestModel.Id);
+        var user = await GetUserByIdAsync(requestModel.Id);
 
-        if (user == null)
-            throw new UserNotFoundException(requestModel.Id.ToString());
+        ValidateUserPassword(user, requestModel.CurrentPassword, requestModel.Password);
 
-        if (!VerifyPassword(user, requestModel.CurrentPassword))
-            throw new UserPasswordIncorrectException(user.Email);
-
-        if (requestModel.Password == requestModel.CurrentPassword)
-            throw new SamePasswordException(user.Email);
-
-        string newPasswordHash = HashPassword(user, requestModel.Password);
+        string newPasswordHash = _authService.HashPassword(user, requestModel.Password);
         user.HashedPassword = newPasswordHash;
         await _userRepository.UpdateAsync(user);
     }
 
     public async Task UpdateUserAsync(UpdateUserContract requestModel)
     {
-        requestModel.Email = requestModel.Email.ToLowerInvariant();
-        requestModel.Username = requestModel.Username.ToLower();
+        requestModel.Email = NormalizeEmail(requestModel.Email);
+        requestModel.Username = NormalizeUsername(requestModel.Username);
 
-        if (requestModel == null)
-            throw new ArgumentNullException(nameof(requestModel), "Request model cannot be null.");
-
-        var existingUser = await _userRepository.GetByIdAsync(requestModel.Id);
-
-        if (existingUser == null)
-            throw new UserNotFoundException(requestModel.Id.ToString());
-
-        var entity = _mapper.Map<UserContract>(requestModel);
-        await _userRepository.UpdateAsync(entity);
+        if (await GetUserByIdAsync(requestModel.Id) != null)
+        {
+            var entity = _mapper.Map<UserContract>(requestModel);
+            await _userRepository.UpdateAsync(entity);
+        }
     }
 
     public async Task<GetUserContract> GetUserAsync(int id)
     {
-        var result = await _userRepository.GetByIdAsync(id);
-
-        if (result == null)
-            throw new UserNotFoundException(id.ToString());
-
-        return _mapper.Map<GetUserContract>(result);
+        var user = await GetUserByIdAsync(id);
+        return _mapper.Map<GetUserContract>(user);
     }
 
-    private bool VerifyPassword(User user, string password)
+    #region Private Helper Methods
+    private string NormalizeEmail(string email)
     {
-        var result = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
-        return result == PasswordVerificationResult.Success;
+        return email.ToLowerInvariant();
     }
 
-    private string HashPassword(User user, string password)
+    private string NormalizeUsername(string username)
     {
-        return _passwordHasher.HashPassword(user, password);
+        return username.ToLowerInvariant();
     }
+
+    private async Task<User> GetUserByEmailAsync(string email)
+    {
+        var user = await _userRepository.GetUserByEmailAsync(email);
+        return (user == null) ? throw new UserNotFoundException(email) : user;
+    }
+
+    private async Task<User> GetUserByIdAsync(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        return user == null ? throw new UserNotFoundException(id.ToString()) : user;
+    }
+
+    private async Task CheckAndHandleExistingUserAsync(string email, string username)
+    {
+        var existingUserByEmail = await _userRepository.UserCheckAndSoftDeletedUserAddAsync(email);
+        if (existingUserByEmail != null)
+        {
+            throw new UserAlreadyExistsException(email);
+        }
+
+        var existingUserByUsername = await _userRepository.UsernameCheckAsync(username);
+        if (existingUserByUsername)
+        {
+            throw new UserAlreadyExistsException(username);
+        }
+    }
+
+    private User CreateUser(RegisterUserContract requestModel)
+    {
+        var user = _mapper.Map<User>(requestModel);
+        user.HashedPassword = _authService.HashPassword(user, requestModel.Password);
+        return user;
+    }
+
+    private async Task UpdateUserLastLoginAsync(User user)
+    {
+        await _userRepository.UserLastLoginUpdateAsync(user);
+    }
+
+    private string GenerateToken(User user)
+    {
+        return _authService.Token(user);
+    }
+
+    private void ValidateUserPassword(User user, string currentPassword, string newPassword)
+    {
+        if (!_authService.VerifyPassword(user, currentPassword))
+            throw new UserPasswordIncorrectException(user.Email);
+
+        if (currentPassword == newPassword)
+            throw new SamePasswordException(user.Email);
+    }
+    #endregion
 }

@@ -2,19 +2,19 @@ using Autofac.Extensions.DependencyInjection;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
 using DayStory.Infrastructure.Data.Context;
-using DayStory.Application.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
 using DayStory.WebAPI.Middlewares;
 using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
 using FluentValidation.AspNetCore;
 using DayStory.Application.Validators;
 using FluentValidation;
 using DayStory.Application.Services;
 using MovieAPI.WebAPI.AutoFac;
+using DayStory.Application.Options;
+using DayStory.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureLogging();
@@ -70,9 +70,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-// OpenAI
+builder.Services.Configure<OpenAIOptions>(config.GetSection("OpenAI"));
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<OpenAIService>();
+builder.Services.AddSingleton<IOpenAIService, OpenAIService>();
 
 builder.Host.UseSerilog();
 
@@ -107,11 +107,6 @@ void ConfigureLogging()
         .Enrich.FromLogContext()
         .Enrich.WithExceptionDetails()
         .WriteTo.Console()
-        //.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["Elasticsearch:Uri"]))
-        //{
-        //    AutoRegisterTemplate = true,
-        //    IndexFormat = "log-{0:yyyy.MM.dd}"
-        //})
         .Enrich.WithProperty("Environment", environment)
         .ReadFrom.Configuration(configuration)
         .CreateLogger();

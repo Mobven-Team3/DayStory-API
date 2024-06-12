@@ -21,9 +21,9 @@ public class UserRepository : GenericRepository<User, UserContract>, IUserReposi
         await UpdateAsync(user);
     }
 
-    public async Task<User?> UserCheckAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        var user = await _dbSet.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
+        var user = await _dbSet.FirstOrDefaultAsync(x => x.Email == email);
         return user;
     }
 
@@ -40,7 +40,7 @@ public class UserRepository : GenericRepository<User, UserContract>, IUserReposi
 
     public async Task<User?> UserCheckAndSoftDeletedUserAddAsync(string email)
     {
-        var user = await UserCheckAsync(email);
+        var user = await _dbSet.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
         if (user != null && user.IsDeleted)
         {
             await SoftDeletedUserAddAsync(user);

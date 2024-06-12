@@ -39,7 +39,7 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
         var result = await _dbSet.Where(e => e.Date.Substring(6, 4) == year && e.Date.Substring(3, 2) == month && e.UserId == userId)
             .AsNoTracking()
             .OrderBy(x => x.Date)
-            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Id)
             .ToListAsync();
 
         return result;

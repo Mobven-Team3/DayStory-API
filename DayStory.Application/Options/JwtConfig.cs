@@ -1,4 +1,4 @@
-﻿namespace DayStory.Application.Auth;
+﻿namespace DayStory.Application.Options;
 
 public class JwtConfig
 {

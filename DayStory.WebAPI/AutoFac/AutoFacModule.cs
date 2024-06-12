@@ -1,14 +1,15 @@
 ﻿using Autofac;
 using AutoMapper;
-using DayStory.Application.Auth;
 using DayStory.Application.Interfaces;
 using DayStory.Application.Mappers;
+using DayStory.Application.Options;
 using DayStory.Application.Services;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Infrastructure.Data.Context;
 using DayStory.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 using Module = Autofac.Module;
 
@@ -20,7 +21,7 @@ public class AutoFacModule : Module
     {
         containerBuilder.RegisterGeneric(typeof(GenericRepository<,>)).As(typeof(IGenericRepository<,>)).InstancePerLifetimeScope();
 
-        containerBuilder.RegisterType<AuthHelper>().As<IAuthHelper>().InstancePerLifetimeScope();
+        containerBuilder.RegisterType<AuthService>().As<IAuthService>().InstancePerLifetimeScope();
         containerBuilder.RegisterType<PasswordHasher<User>>().As<IPasswordHasher<User>>().InstancePerLifetimeScope();
 
         containerBuilder.Register(context =>
@@ -53,20 +54,21 @@ public class AutoFacModule : Module
             .AsImplementedInterfaces()
             .InstancePerLifetimeScope();
 
-        // OpenAI
+        // OpenAI configuration
         containerBuilder.Register(context =>
         {
             var configuration = context.Resolve<IConfiguration>();
-            var apiKey = configuration["OpenAI:ApiKey"];
+            var openAIOptions = new OpenAIOptions();
+            configuration.GetSection("OpenAI").Bind(openAIOptions);
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(openAIOptions.ApiKey))
             {
                 throw new ArgumentNullException("OpenAI:ApiKey", "API key is not configured. Please check your configuration.");
             }
 
             var httpClientFactory = context.Resolve<IHttpClientFactory>();
             var httpClient = httpClientFactory.CreateClient();
-            return new OpenAIService(httpClient, apiKey);
+            return new OpenAIService(httpClient, Options.Create(openAIOptions));
         }).As<IOpenAIService>().SingleInstance();
     }
 }
