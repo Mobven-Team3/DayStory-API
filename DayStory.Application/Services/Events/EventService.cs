@@ -23,12 +23,12 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         EnsureDateIsToday(model.Date);
 
-        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+        //var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
 
-        if (existingDaySummary != null)
-        {
-            throw new DaySummaryAlreadyExistsException(model.Date);
-        }
+        //if (existingDaySummary != null)
+        //{
+        //    throw new DaySummaryAlreadyExistsException(model.Date);
+        //}
 
         var entity = _mapper.Map<Event>(model);
 
@@ -98,10 +98,10 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
         EnsureDateIsToday(entity.Date);
 
-        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(entity.Date, userId);
+        //var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(entity.Date, userId);
 
-        if (existingDaySummary != null)
-            throw new DaySummaryAlreadyExistsException(entity.Date);
+        //if (existingDaySummary != null)
+        //    throw new DaySummaryAlreadyExistsException(entity.Date);
 
         await _eventRepository.RemoveByIdAsync(id);
     }
@@ -110,12 +110,12 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     {
         EnsureDateIsToday(model.Date);
 
-        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
+        //var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
 
-        if (existingDaySummary != null)
-        {
-            throw new DaySummaryAlreadyExistsException(model.Date);
-        }
+        //if (existingDaySummary != null)
+        //{
+        //    throw new DaySummaryAlreadyExistsException(model.Date);
+        //}
 
         var existCheck = await _eventRepository.GetByIdAsync(model.Id);
 
