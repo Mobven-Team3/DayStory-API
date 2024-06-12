@@ -9,9 +9,6 @@ using DayStory.Domain.Repositories;
 using DayStory.Infrastructure.Data.Context;
 using DayStory.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
-using StackExchange.Redis;
 using System.Reflection;
 using Module = Autofac.Module;
 
@@ -70,6 +67,6 @@ public class AutoFacModule : Module
             var httpClientFactory = context.Resolve<IHttpClientFactory>();
             var httpClient = httpClientFactory.CreateClient();
             return new OpenAIService(httpClient, apiKey);
-        }).AsSelf().SingleInstance();
+        }).As<IOpenAIService>().SingleInstance();
     }
 }

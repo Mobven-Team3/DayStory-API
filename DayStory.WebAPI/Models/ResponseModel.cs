@@ -9,7 +9,7 @@ public partial class ResponseModel
         return JsonSerializer.Serialize(this);
     }
 
-    public ResponseModel(string message = null, int statusCode = 400)
+    public ResponseModel(string? message = null, int statusCode = 400)
     {
         StatusCode = statusCode;
         if (string.IsNullOrWhiteSpace(message))
@@ -30,7 +30,7 @@ public partial class ResponseModel<T>
 {
     public int StatusCode { get; set; }
     public string Message { get; set; }
-    public T Data { get; set; }
+    public T? Data { get; set; }
 
     public ResponseModel(int statusCode, string message)
     {

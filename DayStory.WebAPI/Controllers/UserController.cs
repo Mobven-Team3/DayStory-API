@@ -51,14 +51,6 @@ public class UserController : Controller
         return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
     }
 
-    //[Authorize(Roles = "Admin")]
-    //[HttpGet]
-    //public async Task<IActionResult> GetAllAsync()
-    //{
-    //    var responseModel = await _userService.GetAllAsync();
-    //    return Ok(responseModel);
-    //}
-
     [Authorize(Roles = "Admin, User")]
     [HttpGet]
     public async Task<IActionResult> GetByIdAsync()

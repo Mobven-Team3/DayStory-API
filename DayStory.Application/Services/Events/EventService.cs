@@ -12,7 +12,11 @@ public class EventService : BaseService<Event, EventContract>, IEventService
     private readonly IEventRepository _eventRepository;
     private readonly IMapper _mapper;
     private readonly IDaySummaryRepository _daySummaryRepository;
-    public EventService(IGenericRepository<Event, EventContract> repository, IMapper mapper, IEventRepository eventRepository, IDaySummaryRepository daySummaryRepository) : base(repository, mapper)
+    public EventService(
+        IGenericRepository<Event, EventContract> repository, 
+        IMapper mapper, 
+        IEventRepository eventRepository, 
+        IDaySummaryRepository daySummaryRepository) : base(repository, mapper)
     {
         _eventRepository = eventRepository;
         _mapper = mapper;
@@ -21,14 +25,7 @@ public class EventService : BaseService<Event, EventContract>, IEventService
 
     public async Task AddEventAsync(CreateEventContract model)
     {
-        EnsureDateIsToday(model.Date);
-
-        //var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
-
-        //if (existingDaySummary != null)
-        //{
-        //    throw new DaySummaryAlreadyExistsException(model.Date);
-        //}
+        await CheckDaySummaryExistsAsync(model.Date, model.UserId);
 
         var entity = _mapper.Map<Event>(model);
 
@@ -96,26 +93,17 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         if (entity == null || entity.UserId != userId)
             throw new EventNotFoundException(id.ToString());
 
-        EnsureDateIsToday(entity.Date);
+        CheckDateIsToday(entity.Date);
 
-        //var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(entity.Date, userId);
-
-        //if (existingDaySummary != null)
-        //    throw new DaySummaryAlreadyExistsException(entity.Date);
+        await CheckDaySummaryExistsAsync(entity.Date, entity.UserId);
 
         await _eventRepository.RemoveByIdAsync(id);
     }
 
     public async Task UpdateEventAsync(UpdateEventContract model)
     {
-        EnsureDateIsToday(model.Date);
 
-        //var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
-
-        //if (existingDaySummary != null)
-        //{
-        //    throw new DaySummaryAlreadyExistsException(model.Date);
-        //}
+        await CheckDaySummaryExistsAsync(model.Date, model.UserId);
 
         var existCheck = await _eventRepository.GetByIdAsync(model.Id);
 
@@ -129,7 +117,7 @@ public class EventService : BaseService<Event, EventContract>, IEventService
             throw new EventNotFoundException(model.Id.ToString());
     }
 
-    private void EnsureDateIsToday(string date)
+    private void CheckDateIsToday(string date)
     {
         if (!DateTime.TryParseExact(date, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out var parsedDate))
         {
@@ -139,6 +127,16 @@ public class EventService : BaseService<Event, EventContract>, IEventService
         if (parsedDate.Date != DateTime.Today)
         {
             throw new EventDateException(date);
+        }
+    }
+
+    private async Task CheckDaySummaryExistsAsync(string date, int userId)
+    {
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(date, userId);
+
+        if (existingDaySummary != null)
+        {
+            throw new DaySummaryAlreadyExistsException(date);
         }
     }
 }

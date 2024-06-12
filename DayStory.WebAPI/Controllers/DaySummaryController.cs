@@ -27,14 +27,6 @@ public class DaySummaryController : Controller
         return Ok(new ResponseModel("Successfully Created", StatusCodes.Status200OK));
     }
 
-    //[Authorize(Roles = "Admin, User")]
-    //[HttpPut]
-    //public async Task<IActionResult> UpdateAsync(DaySummaryContract request)
-    //{
-    //    await _daySummaryService.UpdateAsync(request);
-    //    return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
-    //}
-
     [Authorize(Roles = "Admin, User")]
     [HttpGet("all")]
     public async Task<IActionResult> GetAllAsync()
@@ -70,14 +62,6 @@ public class DaySummaryController : Controller
         var responseModel = await _daySummaryService.GetDaySummariesByMonthAsync(request);
         return Ok(new ResponseModel<List<GetDaySummaryContract>>(responseModel, StatusCodes.Status200OK));
     }
-
-    //[Authorize(Roles = "Admin, User")]
-    //[HttpDelete("{id}")]
-    //public async Task<IActionResult> DeleteAsync(int id)
-    //{
-    //    await _daySummaryService.RemoveByIdAsync(id);
-    //    return Ok(new ResponseModel("Successfully Deleted", StatusCodes.Status200OK));
-    //}
 
     [Authorize(Roles = "Admin, User")]
     [HttpGet("Pages")]

@@ -17,7 +17,12 @@ public class UserService : BaseService<User, UserContract>, IUserService
     private readonly IAuthHelper _authHelper;
     private readonly IPasswordHasher<User> _passwordHasher;
 
-    public UserService(IGenericRepository<User, UserContract> repository, IMapper mapper, IUserRepository userRepository, IAuthHelper authHelper, IPasswordHasher<User> passwordHasher) : base(repository, mapper)
+    public UserService(
+        IGenericRepository<User, UserContract> repository, 
+        IMapper mapper, 
+        IUserRepository userRepository, 
+        IAuthHelper authHelper, 
+        IPasswordHasher<User> passwordHasher) : base(repository, mapper)
     {
         _userRepository = userRepository;
         _mapper = mapper;
@@ -50,15 +55,12 @@ public class UserService : BaseService<User, UserContract>, IUserService
         requestModel.Email = requestModel.Email.ToLowerInvariant();
         requestModel.Username = requestModel.Username.ToLower();
 
-        var userEmailCheck = await _userRepository.UserCheckAsync(requestModel.Email);
+        var userEmailCheck = await _userRepository.UserCheckAndSoftDeletedUserAddAsync(requestModel.Email);
         var userUsernameCheck = await _userRepository.UsernameCheckAsync(requestModel.Username);
 
         if (userEmailCheck != null)
         {
-            if (userEmailCheck.IsDeleted)
-                await _userRepository.SoftDeletedUserAddAsync(userEmailCheck);
-            else
-                throw new UserAlreadyExistsException(requestModel.Email);
+            throw new UserAlreadyExistsException(requestModel.Email);
         }
         else if (userUsernameCheck)
         {
@@ -74,13 +76,10 @@ public class UserService : BaseService<User, UserContract>, IUserService
 
     public async Task UpdatePasswordAsync(PasswordUpdateUserContract requestModel)
     {
-        if (requestModel.Id == null)
-            throw new ArgumentNullException(nameof(requestModel.Id), "User ID cannot be null");
-        
         var user = await _userRepository.GetByIdAsync(requestModel.Id);
 
         if (user == null)
-            throw new UserNotFoundException(user.Id.ToString());
+            throw new UserNotFoundException(requestModel.Id.ToString());
 
         if (!VerifyPassword(user, requestModel.CurrentPassword))
             throw new UserPasswordIncorrectException(user.Email);
@@ -93,17 +92,6 @@ public class UserService : BaseService<User, UserContract>, IUserService
         await _userRepository.UpdateAsync(user);
     }
 
-    public bool VerifyPassword(User user, string password)
-    {
-        var result = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
-        return result == PasswordVerificationResult.Success;
-    }
-
-    public string HashPassword(User user, string password)
-    {
-        return _passwordHasher.HashPassword(user, password);
-    }
-
     public async Task UpdateUserAsync(UpdateUserContract requestModel)
     {
         requestModel.Email = requestModel.Email.ToLowerInvariant();
@@ -112,10 +100,10 @@ public class UserService : BaseService<User, UserContract>, IUserService
         if (requestModel == null)
             throw new ArgumentNullException(nameof(requestModel), "Request model cannot be null.");
 
-        var existingUser = await _userRepository.GetByIdAsync((int)requestModel.Id);
+        var existingUser = await _userRepository.GetByIdAsync(requestModel.Id);
 
         if (existingUser == null)
-            throw new UserNotFoundException(existingUser.Id.ToString());
+            throw new UserNotFoundException(requestModel.Id.ToString());
 
         var entity = _mapper.Map<UserContract>(requestModel);
         await _userRepository.UpdateAsync(entity);
@@ -124,8 +112,21 @@ public class UserService : BaseService<User, UserContract>, IUserService
     public async Task<GetUserContract> GetUserAsync(int id)
     {
         var result = await _userRepository.GetByIdAsync(id);
+
         if (result == null)
             throw new UserNotFoundException(id.ToString());
+
         return _mapper.Map<GetUserContract>(result);
+    }
+
+    private bool VerifyPassword(User user, string password)
+    {
+        var result = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
+        return result == PasswordVerificationResult.Success;
+    }
+
+    private string HashPassword(User user, string password)
+    {
+        return _passwordHasher.HashPassword(user, password);
     }
 }

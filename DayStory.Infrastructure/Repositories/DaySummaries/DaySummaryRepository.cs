@@ -27,7 +27,7 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
         return result;
     }
 
-    public async Task<DaySummary> GetDaySummaryByDayAsync(string date, int userId)
+    public async Task<DaySummary?> GetDaySummaryByDayAsync(string date, int userId)
     {
         var result = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Date == date && x.UserId == userId);
 

@@ -23,13 +23,13 @@ public class BaseService<TEntity, TContract> : IBaseService<TEntity, TContract>
     public async Task AddAsync(TContract model)
     {
         var entity = _mapper.Map<TEntity>(model);
-        var result = await _repository.AddAsync(entity);
+        await _repository.AddAsync(entity);
     }
 
     public async Task AddRangeAsync(List<TContract> datas)
     {
         var list = _mapper.Map<List<TEntity>>(datas);
-        var result = await _repository.AddRangeAsync(list);
+        await _repository.AddRangeAsync(list);
     }
 
     public async Task<List<TContract>> GetAllAsync()
@@ -47,23 +47,23 @@ public class BaseService<TEntity, TContract> : IBaseService<TEntity, TContract>
     public async Task RemoveAsync(TContract model)
     {
         var entity = _mapper.Map<TEntity>(model);
-        var result = await (_repository.RemoveAsync(entity));
+        await (_repository.RemoveAsync(entity));
     }
 
     public async Task RemoveByIdAsync(int id)
     {
-        var result = await _repository.RemoveByIdAsync(id);
+        await _repository.RemoveByIdAsync(id);
     }
 
     public async Task RemoveRangeAsync(List<TContract> datas)
     {
         var list = _mapper.Map<List<TEntity>>(datas);
-        var result = await _repository.RemoveRangeAsync(list);
+        await _repository.RemoveRangeAsync(list);
     }
 
     public async Task UpdateAsync(TContract model)
     {
-        var result = await _repository.UpdateAsync(model);
+        await _repository.UpdateAsync(model);
     }
 
     public async Task<PagedResponse<TContract>> GetPagedDataAsync(int pageNumber, int pageSize)
