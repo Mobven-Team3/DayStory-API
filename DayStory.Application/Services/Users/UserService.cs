@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
-using DayStory.Common.DTOs.Users;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Exceptions;
 using DayStory.Domain.Repositories;
-using Microsoft.AspNetCore.Identity;
 
 namespace DayStory.Application.Services;
 

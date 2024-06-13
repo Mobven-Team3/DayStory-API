@@ -1,4 +1,4 @@
-﻿namespace DayStory.Common.DTOs.Users;
+﻿namespace DayStory.Common.DTOs;
 
 public class LoginUserResponseContract
 {

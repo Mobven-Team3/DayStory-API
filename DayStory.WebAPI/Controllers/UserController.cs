@@ -1,7 +1,5 @@
-﻿using Azure.Core;
-using DayStory.Application.Interfaces;
+﻿using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
-using DayStory.Common.DTOs.Users;
 using DayStory.WebAPI.Helpers;
 using DayStory.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;

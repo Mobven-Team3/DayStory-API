@@ -19,8 +19,4 @@
     <ProjectReference Include="..\DayStory.Infrastructure\DayStory.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Auth\" />
-  </ItemGroup>
-
 </Project>
