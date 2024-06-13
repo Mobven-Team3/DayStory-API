@@ -1,19 +1,24 @@
-﻿using DayStory.Domain.Entities;
+﻿using DayStory.Application.Interfaces;
+using DayStory.Application.Options;
+using DayStory.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace DayStory.Application.Auth;
+namespace DayStory.Application.Services;
 
-public class AuthHelper : IAuthHelper
+public class AuthService : IAuthService
 {
     private readonly JwtConfig _jwtConfig;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public AuthHelper(IOptionsMonitor<JwtConfig> jwtConfig)
+    public AuthService(IOptionsMonitor<JwtConfig> jwtConfig, IPasswordHasher<User> passwordHasher)
     {
         _jwtConfig = jwtConfig.CurrentValue;
+        _passwordHasher = passwordHasher;
     }
 
     public Claim[] GetClaims(User user)
@@ -44,5 +49,16 @@ public class AuthHelper : IAuthHelper
 
         var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
         return accessToken;
+    }
+
+    public bool VerifyPassword(User user, string password)
+    {
+        var result = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
+        return result == PasswordVerificationResult.Success;
+    }
+
+    public string HashPassword(User user, string password)
+    {
+        return _passwordHasher.HashPassword(user, password);
     }
 }

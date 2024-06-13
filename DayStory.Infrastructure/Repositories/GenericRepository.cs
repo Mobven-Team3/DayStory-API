@@ -24,20 +24,14 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
     {
         var getQuery = Table.AsNoTracking();
 
-        if (getQuery != null)
-            return await Task.FromResult(getQuery);
-        else
-            throw new ArgumentNullException(typeof(IQueryable<TEntity>).ToString());
+        return getQuery != null ? await Task.FromResult(getQuery) : throw new ArgumentNullException(typeof(IQueryable<TEntity>).ToString());
     }
 
     public async Task<TEntity> GetByIdAsync(int id)
     {
         var result = await Table.FindAsync(id);
 
-        if (result != null)
-            return result;
-        else
-            throw new ArgumentNullException();
+        return result != null ? result : throw new ArgumentNullException(typeof(TEntity).ToString());
     }
 
     public async Task<PagedResponse<TEntity>> GetPagedDataAsync(int pageNumber, int pageSize)
@@ -137,11 +131,7 @@ public class GenericRepository<TEntity, TContract> : IGenericRepository<TEntity,
     public async Task<bool> RemoveByIdAsync(int id)
     {
         var model = await Table.FirstOrDefaultAsync(data => data.Id == id);
-        if (model == null)
-        {
-            throw new ArgumentNullException(typeof(TEntity).ToString());
-        }
-        return await RemoveAsync(model);
+        return model == null ? throw new ArgumentNullException(typeof(TEntity).ToString()) : await RemoveAsync(model);
     }
 
     public async Task SaveAsync()

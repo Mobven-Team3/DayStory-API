@@ -1,81 +1,108 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 using DayStory.Application.Constants;
+using DayStory.Application.Interfaces;
+using DayStory.Application.Options;
 using DayStory.Common.DTOs;
-using DayStory.Domain.Entities;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace DayStory.Application.Services;
 
-public class OpenAIService
+public class OpenAIService : IOpenAIService
 {
     private readonly HttpClient _httpClient;
-    private readonly string _openAIApiKey;
+    private readonly OpenAIOptions _openAIOptions;
 
-    public OpenAIService(HttpClient httpClient, string openAIApiKey)
+    public OpenAIService(HttpClient httpClient, IOptions<OpenAIOptions> openAIOptions)
     {
         _httpClient = httpClient;
-        _openAIApiKey = openAIApiKey;
+        _openAIOptions = openAIOptions.Value;
     }
 
     public async Task<string> GetSummaryAsync(string text)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _openAIApiKey);
-
-        var requestBody = new
-        {
-            model = "gpt-3.5-turbo",
-            messages = new[]
-        {
-            new { role = "system", content = "You are a helpful assistant." },
-            new { role = "user", content = OpenAIPrompts.GetSummaryPrompt(text)}
-        },
-            max_tokens = 150, // Yaklaşık 500 karakter
-            temperature = 0.7
-        };
-
-        request.Content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
-
-        var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        dynamic responseObject = JsonConvert.DeserializeObject(responseContent);
-
-        return responseObject.choices[0].message.content;
+        var request = CreateChatCompletionRequest(text);
+        var responseContent = await SendRequestAsync(request);
+        return ParseChatCompletionResponse(responseContent);
     }
 
     public async Task<byte[]> GenerateImageAsync(string summary, string artStyle)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/images/generations");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _openAIApiKey);
+        var request = CreateImageGenerationRequest(summary, artStyle);
+        var responseContent = await SendRequestAsync(request);
+        return await ParseImageGenerationResponseAsync(responseContent);
+    }
+
+    #region Private Helper Methods
+
+    private HttpRequestMessage CreateChatCompletionRequest(string text)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, _openAIOptions.ChatCompletionsEndpoint);
+        request.Headers.Authorization = new AuthenticationHeaderValue(OpenAIConstants.AuthorizationHeaderScheme, _openAIOptions.ApiKey);
 
         var requestBody = new
         {
-            model = "dall-e-3",
-            prompt = OpenAIPrompts.GetImagePrompt(summary, artStyle),
-            size = "1024x1024",
-            quality = "standard",
-            n = 1
+            model = OpenAIConstants.ChatModel,
+            messages = new[]
+            {
+                    new { role = OpenAIConstants.SystemRole, content = OpenAIConstants.SystemMessageContent },
+                    new { role = OpenAIConstants.UserRole, content = OpenAIPrompts.GetSummaryPrompt(text) }
+                },
+            max_tokens = OpenAIConstants.MaxTokens,
+            temperature = OpenAIConstants.Temperature
         };
 
-        request.Content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+        request.Content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, OpenAIConstants.ContentTypeJson);
+        return request;
+    }
 
-        var response = await _httpClient.SendAsync(request);
-        if (!response.IsSuccessStatusCode)
+    private HttpRequestMessage CreateImageGenerationRequest(string summary, string artStyle)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, _openAIOptions.ImageGenerationsEndpoint);
+        request.Headers.Authorization = new AuthenticationHeaderValue(OpenAIConstants.AuthorizationHeaderScheme, _openAIOptions.ApiKey);
+
+        var requestBody = new
         {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException($"Failed to generate image: {response.StatusCode} {errorContent}");
-        }
+            model = OpenAIConstants.ImageModel,
+            prompt = OpenAIPrompts.GetImagePrompt(summary, artStyle),
+            size = OpenAIConstants.ImageSize,
+            quality = OpenAIConstants.ImageQuality,
+            n = OpenAIConstants.ImageCount
+        };
 
-        var responseContent = await response.Content.ReadAsStringAsync();
+        request.Content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, OpenAIConstants.ContentTypeJson);
+        return request;
+    }
+
+    private async Task<string> SendRequestAsync(HttpRequestMessage request)
+    {
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    private string ParseChatCompletionResponse(string responseContent)
+    {
+        var responseObject = JsonConvert.DeserializeObject<OpenAIResponse>(responseContent);
+
+        return responseObject == null || responseObject.choices == null || responseObject.choices.Count == 0 || responseObject.choices[0].message == null
+            ? throw new InvalidOperationException("Invalid response from OpenAI API.")
+            : responseObject.choices[0].message.content;
+    }
+
+    private async Task<byte[]> ParseImageGenerationResponseAsync(string responseContent)
+    {
         var responseObject = JsonConvert.DeserializeObject<OpenAIImageResponse>(responseContent);
+
+        if (responseObject?.data == null || responseObject.data.Count == 0 || string.IsNullOrEmpty(responseObject.data[0].url))
+        {
+            throw new InvalidOperationException("Invalid response from OpenAI API.");
+        }
 
         var imageUrl = responseObject.data[0].url;
         return await _httpClient.GetByteArrayAsync(imageUrl);
     }
+
+    #endregion
 }

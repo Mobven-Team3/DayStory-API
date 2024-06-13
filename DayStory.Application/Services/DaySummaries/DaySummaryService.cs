@@ -4,7 +4,7 @@ using DayStory.Application.Interfaces;
 using DayStory.Domain.Entities;
 using DayStory.Domain.Repositories;
 using DayStory.Domain.Exceptions;
-using System.Globalization;
+using DayStory.Application.Helper;
 
 namespace DayStory.Application.Services;
 
@@ -14,8 +14,14 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
     private readonly IEventService _eventService;
     private readonly IArtStyleService _artStyleService;
     private readonly IMapper _mapper;
-    private readonly OpenAIService _openAIService;
-    public DaySummaryService(IGenericRepository<DaySummary, DaySummaryContract> repository, IMapper mapper, IDaySummaryRepository daySummaryRepository, IEventService eventService, IArtStyleService artStyleService, OpenAIService openAIService) : base(repository, mapper)
+    private readonly IOpenAIService _openAIService;
+    public DaySummaryService(
+        IGenericRepository<DaySummary, DaySummaryContract> repository, 
+        IMapper mapper, 
+        IDaySummaryRepository daySummaryRepository, 
+        IEventService eventService, 
+        IArtStyleService artStyleService, 
+        IOpenAIService openAIService) : base(repository, mapper)
     {
         _daySummaryRepository = daySummaryRepository;
         _mapper = mapper;
@@ -24,131 +30,94 @@ public class DaySummaryService : BaseService<DaySummary, DaySummaryContract>, ID
         _openAIService = openAIService;
     }
 
-    public async Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model)
+    public async Task AddDaySummaryAsync(CreateDaySummaryContract model)
     {
-        // Check if the date is today
-        EnsureDateIsToday(model.Date);
+        await CheckDaySummaryExistsAsync(model.Date, model.UserId);
 
-        // Checks if there is a daysummary created
-        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, model.UserId);
-        if (existingDaySummary != null)
-            throw new DaySummaryAlreadyExistsException(model.Date);
-
-        var createdModel = _mapper.Map<DaySummaryContract>(model);
-
-        // Get Events on the entered date
-        createdModel.Events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
-        {
-            Date = createdModel.Date,
-            UserId = createdModel.UserId,
-        });
-
-        if (createdModel.Events == null || !createdModel.Events.Any())
-            throw new EventNotFoundWithGivenDateException(model.Date);
-
-        // Get random theme
-        var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
-        if (randomArtStyle == null)
-            throw new InvalidOperationException("Failed to retrieve a random art style.");
-        
-        createdModel.ArtStyleId = randomArtStyle.Id;
-
-        // Sending events to AI and creating a day summary
-        var eventsText = string.Join("\n", createdModel.Events.Select(e => $"{e.Title}: {e.Description}"));
-        var summary = await _openAIService.GetSummaryAsync(eventsText);
-
-        // Sending summary to AI and creating a image
-        var imageBytes = await _openAIService.GenerateImageAsync(summary, randomArtStyle.Name);
-
-        // Save image to path
-        var imagePath = SaveImage(imageBytes, createdModel.Date, createdModel.UserId);
-        createdModel.ImagePath = imagePath;
-
-        // Characters are limited to 500
-        summary = (summary.Length > 500) ? summary.Substring(0, 497) + "..." : summary;
-
-        createdModel.Summary = summary.Trim();
+        var createdModel = await GenerateDaySummaryContract(model);
 
         var daySummaryEntity = _mapper.Map<DaySummary>(createdModel);
         await _daySummaryRepository.AddDaySummaryAsync(daySummaryEntity);
-
-        return createdModel;
-    }
-
-    private string SaveImage(byte[] imageBytes, string date, int? userId)
-    {
-        var folderPath = Path.Combine("wwwroot", "images", "daysummaries", $"{userId}");
-        if (!Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
-
-        var fileName = $"{date.Replace("-", "")}_{Guid.NewGuid()}.png";
-        var filePath = Path.Combine(folderPath, fileName);
-
-        File.WriteAllBytes(filePath, imageBytes);
-
-        return filePath;
     }
 
     public async Task<List<GetDaySummaryContract>> GetDaySummariesAsync(int userId)
     {
         var response = await _daySummaryRepository.GetDaySummariesByUserIdAsync(userId);
-        if (response == null)
-            throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString());
-        else
-            return _mapper.Map<List<GetDaySummaryContract>>(response);
+        return (response == null) ? throw new DaySummaryNotFoundWithGivenUserIdException(userId.ToString()) : _mapper.Map<List<GetDaySummaryContract>>(response);
     }
 
     public async Task<GetDaySummaryContract> GetDaySummaryByIdAsync(int id, int userId)
     {
         var entity = await _daySummaryRepository.GetByIdAsync(id);
-        if (entity == null || entity.UserId != userId)
-            throw new DaySummaryNotFoundException(id.ToString());
-        else
-            return _mapper.Map<GetDaySummaryContract>(entity);
+        return (entity == null || entity.UserId != userId) ? throw new DaySummaryNotFoundException(id.ToString()) : _mapper.Map<GetDaySummaryContract>(entity);
     }
 
     public async Task<List<GetDaySummaryContract>> GetDaySummariesByMonthAsync(GetDaySummariesByMonthContract model)
     {
-        if (model != null)
-        {
-            var response = await _daySummaryRepository.GetDaySummariesByMonthAsync(model.Year, model.Month, (int)model.UserId);
-
-            if (response != null)
-                return _mapper.Map<List<GetDaySummaryContract>>(response);
-            else
-                throw new DaySummaryNotFoundWithGivenDateException(model.Month);
-        }
-        else
-            throw new ArgumentNullException(nameof(model));
+        var response = await _daySummaryRepository.GetDaySummariesByMonthAsync(model.Year, model.Month, (int)model.UserId);
+        return (response != null) ? _mapper.Map<List<GetDaySummaryContract>>(response) : throw new DaySummaryNotFoundWithGivenDateException(model.Month);
     }
 
     public async Task<GetDaySummaryContract> GetDaySummaryByDayAsync(GetDaySummaryByDayContract model)
     {
-        if (model != null)
-        {
-            var response = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, (int)model.UserId);
-
-            if (response != null)
-                return _mapper.Map<GetDaySummaryContract>(response);
-            else
-                throw new DaySummaryNotFoundWithGivenDateException(model.Date);
-        }
-        else
-            throw new ArgumentNullException(nameof(model));
+        var response = await _daySummaryRepository.GetDaySummaryByDayAsync(model.Date, (int)model.UserId);
+        return (response != null) ? _mapper.Map<GetDaySummaryContract>(response) : throw new DaySummaryNotFoundWithGivenDateException(model.Date);
     }
 
-    private void EnsureDateIsToday(string dateString)
+    #region Private Helper Methods
+    private async Task<DaySummaryContract> GenerateDaySummaryContract(CreateDaySummaryContract model)
     {
-        if (!DateTime.TryParseExact(dateString, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-        {
-            throw new InvalidDaySummaryDateException(dateString);
-        }
+        var createdModel = _mapper.Map<DaySummaryContract>(model);
 
-        if (date.Date != DateTime.UtcNow.Date)
-        {
-            throw new DaySummaryDateException(dateString);
-        }
+        createdModel.Events = await GetEventsOnDateAsync(createdModel.Date, createdModel.UserId);
+
+        var randomArtStyle = await GetRandomArtStyleAsync();
+        createdModel.ArtStyleId = randomArtStyle.Id;
+
+        var summary = await CreateDaySummaryTextAsync(createdModel.Events);
+
+        createdModel.ImagePath = await GenerateAndSaveImageAsync(summary, randomArtStyle.Name, createdModel.Date, createdModel.UserId);
+
+        createdModel.Summary = DaySummaryHelper.TrimSummaryToMaxLength(summary, 500);
+
+        return createdModel;
     }
+
+    private async Task CheckDaySummaryExistsAsync(string date, int userId)
+    {
+        var existingDaySummary = await _daySummaryRepository.GetDaySummaryByDayAsync(date, userId);
+
+        if (existingDaySummary != null)
+            throw new DaySummaryAlreadyExistsException(date);
+    }
+
+    private async Task<List<GetEventContract>> GetEventsOnDateAsync(string date, int userId)
+    {
+        var events = await _eventService.GetEventsByDayAsync(new GetEventsByDayContract()
+        {
+            Date = date,
+            UserId = userId,
+        });
+
+        return (!events.Any()) ? throw new EventNotFoundWithGivenDateException(date) : events;
+    }
+
+    private async Task<ArtStyleContract> GetRandomArtStyleAsync()
+    {
+        var randomArtStyle = await _artStyleService.GetRandomArtStyleIdAsync();
+        return (randomArtStyle == null) ? throw new InvalidOperationException("Failed to retrieve a random art style.") : randomArtStyle;
+    }
+
+    private async Task<string> CreateDaySummaryTextAsync(List<GetEventContract> events)
+    {
+        var eventsText = string.Join("\n", events.Select(e => $"{e.Title}: {e.Description}"));
+        return await _openAIService.GetSummaryAsync(eventsText);
+    }
+
+    private async Task<string> GenerateAndSaveImageAsync(string summary, string artStyle, string date, int? userId)
+    {
+        var imageBytes = await _openAIService.GenerateImageAsync(summary, artStyle);
+        return DaySummaryHelper.SaveImage(imageBytes, date, userId);
+    }
+    #endregion
 }

@@ -28,7 +28,7 @@ public class EventRepository : GenericRepository<Event, EventContract>, IEventRe
         var result = await _dbSet.Where(x => x.Date ==  date && x.UserId == userId)
             .AsNoTracking()
             .OrderBy(x => x.Time)
-            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Id)
             .ToListAsync();
 
         return result;

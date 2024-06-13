@@ -21,15 +21,10 @@ public class UserRepository : GenericRepository<User, UserContract>, IUserReposi
         await UpdateAsync(user);
     }
 
-    public async Task<User> UserCheckAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        var user = await _dbSet.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
-        if (user != null)
-        {
-            return user;
-        }
-        else
-            return null;
+        var user = await _dbSet.FirstOrDefaultAsync(x => x.Email == email);
+        return user;
     }
 
     public async Task UserLastLoginUpdateAsync(User user)
@@ -40,14 +35,17 @@ public class UserRepository : GenericRepository<User, UserContract>, IUserReposi
 
     public async Task<bool> UsernameCheckAsync(string username)
     {
-        var userCheck = await _dbSet.FirstOrDefaultAsync(x => x.Username == username);
-        if (userCheck != null)
+        return await _dbSet.AnyAsync(x => x.Username == username);
+    }
+
+    public async Task<User?> UserCheckAndSoftDeletedUserAddAsync(string email)
+    {
+        var user = await _dbSet.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Email == email);
+        if (user != null && user.IsDeleted)
         {
-            userCheck.LastLogin = DateTime.UtcNow;
-            await SaveAsync();
-            return true;
+            await SoftDeletedUserAddAsync(user);
+            return user;
         }
-        else
-            return false;
+        return user;
     }
 }

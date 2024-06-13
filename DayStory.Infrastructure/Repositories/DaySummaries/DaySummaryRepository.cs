@@ -27,7 +27,7 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
         return result;
     }
 
-    public async Task<DaySummary> GetDaySummaryByDayAsync(string date, int userId)
+    public async Task<DaySummary?> GetDaySummaryByDayAsync(string date, int userId)
     {
         var result = await _dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Date == date && x.UserId == userId);
 
@@ -39,7 +39,7 @@ public class DaySummaryRepository : GenericRepository<DaySummary, DaySummaryCont
         var result = await _dbSet.Where(e => e.Date.Substring(6, 4) == year && e.Date.Substring(3, 2) == month && e.UserId == userId)
             .AsNoTracking()
             .OrderBy(x => x.Date)
-            .OrderBy(x => x.Id)
+            .ThenBy(x => x.Id)
             .ToListAsync();
 
         return result;

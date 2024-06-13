@@ -5,7 +5,7 @@ namespace DayStory.Application.Interfaces;
 
 public interface IDaySummaryService : IBaseService<DaySummary, DaySummaryContract>
 {
-    Task<DaySummaryContract> AddDaySummaryAsync(CreateDaySummaryContract model);
+    Task AddDaySummaryAsync(CreateDaySummaryContract model);
     Task<List<GetDaySummaryContract>> GetDaySummariesAsync(int userId);
     Task<GetDaySummaryContract> GetDaySummaryByIdAsync(int id, int userId);
     Task<GetDaySummaryContract> GetDaySummaryByDayAsync(GetDaySummaryByDayContract model);

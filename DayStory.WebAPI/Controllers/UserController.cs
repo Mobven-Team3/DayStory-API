@@ -1,7 +1,5 @@
-﻿using Azure.Core;
-using DayStory.Application.Interfaces;
+﻿using DayStory.Application.Interfaces;
 using DayStory.Common.DTOs;
-using DayStory.Common.DTOs.Users;
 using DayStory.WebAPI.Helpers;
 using DayStory.WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -50,14 +48,6 @@ public class UserController : Controller
         await _userService.UpdatePasswordAsync(request);
         return Ok(new ResponseModel("Successfully Updated", StatusCodes.Status200OK));
     }
-
-    //[Authorize(Roles = "Admin")]
-    //[HttpGet]
-    //public async Task<IActionResult> GetAllAsync()
-    //{
-    //    var responseModel = await _userService.GetAllAsync();
-    //    return Ok(responseModel);
-    //}
 
     [Authorize(Roles = "Admin, User")]
     [HttpGet]
